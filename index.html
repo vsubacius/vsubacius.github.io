@@ -3,91 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Projects Portfolio</title>
+    <title>Vytas' Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
             color: #333;
         }
         header {
-            background-color: #007acc;
+            background: url('https://source.unsplash.com/1600x900/?technology,code') no-repeat center center/cover;
             color: white;
-            padding: 20px 10%;
+            padding: 60px 10%;
             text-align: center;
         }
         nav {
+            background: #007acc;
             text-align: center;
-            margin: 20px 0;
+            padding: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
         nav a {
+            color: white;
             margin: 0 15px;
             text-decoration: none;
-            color: #007acc;
             font-weight: bold;
+            padding: 8px 15px;
+            transition: 0.3s;
+        }
+        nav a:hover {
+            background: white;
+            color: #007acc;
+            border-radius: 5px;
         }
         .container {
             max-width: 1200px;
             margin: auto;
             padding: 20px;
         }
-        .project {
+        .about, .project {
             background: white;
-            margin: 15px 0;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        .about {
-            background: white;
-            margin: 15px 0;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        .projects {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .project img {
+            width: 100%;
+            border-radius: 8px;
         }
         footer {
+            background: #007acc;
+            color: white;
             text-align: center;
             padding: 20px;
-            background-color: #007acc;
+            margin-top: 20px;
+        }
+        .socials {
+            margin-top: 10px;
+        }
+        .socials a {
             color: white;
-            position: relative;
-            bottom: 0;
-            width: 100%;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 1.2em;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>Welcome to Vytas' Projects Portfolio!</h1>
-        <p>Showcasing my work and achievements >>This website is under development </p>
+        <h1>Vytas Subacius</h1>
+        <p>Engineer | AI Enthusiast | Innovator</p>
     </header>
     <nav>
+        <a href="#about">About</a>
         <a href="#projects">Projects</a>
-        <a href="Vytas Resume (5).pdf" target="_blank">Resume</a>
+        <a href="Vytas Resume.pdf" target="_blank">Resume</a>
     </nav>
     <div class="container">
-        <section class="about">
-            <h2>Who Am I?</h2>
-            <p> My name is Vytas! I am a very hard-working and dedicated Computer Engineer with a passion for quantum computing, aviation, AI, and cryptocurrency! I have extensive experience working in professional settings and am ready to make a positive impact in the world. My goal is to contribute innovative solutions to complex challenges and to continue learning and growing in my field.</p>
+        <section id="about" class="about">
+            <h2>About Me</h2>
+            <p>Hello! I'm Vytas, a passionate Computer Engineer with a deep interest in aerospace, AI, robotics, and more. My mission is to push the boundaries of technology and create innovative solutions that make a difference.</p>
         </section>
         <section id="projects">
             <h2>My Projects</h2>
-            <div class="project">
-                <h3>Drone Project</h3>
-                <p>Details about building an autonomous drone, challenges faced, and solutions implemented.</p>
-                <a href="https://github.com/vsubacius/AutonomousDrone/wiki" target="_blank">View on GitHub</a>
-            </div>
-            <div class="project">
-                <h3>PulsR AI Project</h3>
-                <p>The PulsR AI Web Portal is a decentralized platform designed to provide exclusive access to private AI models (GPTs) through a Web3 integration. The project emphasizes innovation, accessibility, and the seamless use of blockchain technology for membership verification and payment processing.</p>
-                <a href="https://github.com/vsubacius/PulsRwebportal" target="_blank">View on GitHub</a>
+            <div class="projects">
+                <div class="project">
+                    <img src="https://source.unsplash.com/600x400/?drone,technology" alt="Drone Project">
+                    <h3>Autonomous Drone</h3>
+                    <p>Built an AI-powered autonomous drone with object detection and flight stabilization.</p>
+                    <a href="https://github.com/vsubacius/AutonomousDrone/wiki" target="_blank">View on GitHub</a>
+                </div>
+                <div class="project">
+                    <img src="https://source.unsplash.com/600x400/?blockchain,AI" alt="PulsR AI">
+                    <h3>PulsR AI Platform</h3>
+                    <p>A Web3-powered AI platform for secure and decentralized access to private AI models.</p>
+                    <a href="https://github.com/vsubacius/PulsRwebportal" target="_blank">View on GitHub</a>
+                </div>
             </div>
         </section>
     </div>
     <footer>
         <p>&copy; 2025 Vytas Subacius. All rights reserved.</p>
+        <div class="socials">
+            <a href="https://www.linkedin.com/in/vytas-subacius333/" target="_blank">LinkedIn</a>
+            <a href="https://github.com/vsubacius" target="_blank">GitHub</a>
+        </div>
     </footer>
 </body>
 </html>
