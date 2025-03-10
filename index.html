@@ -14,21 +14,10 @@
             color: #333;
         }
         header {
-            background-color: #333;
+            background: url('nature_banner.jpg') no-repeat center center/cover;
             color: white;
             padding: 60px 10%;
             text-align: center;
-            position: relative;
-        }
-        header img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0.7;
-            z-index: -1;
         }
         nav {
             background: #007acc;
@@ -79,38 +68,26 @@
             padding: 20px;
             margin-top: 20px;
         }
+        .socials {
+            margin-top: 10px;
+        }
         .socials a {
             color: white;
             text-decoration: none;
             margin: 0 10px;
             font-size: 1.2em;
         }
-        .btn-resume {
-            display: inline-block;
-            margin-top: 15px;
-            padding: 10px 20px;
-            background: #007acc;
-            color: white;
-            border-radius: 5px;
-            text-decoration: none;
-            transition: 0.3s;
-        }
-        .btn-resume:hover {
-            background: #005fa3;
-        }
     </style>
 </head>
 <body>
-    <header>
-        <img id="banner" src="https://source.unsplash.com/1600x900/?nature" alt="Nature Banner">
+    <header style="background: url('nature_banner.jpg') no-repeat center center/cover;">
         <h1>Vytas Subacius</h1>
-        <p>Engineer | AI Enthusiast | Innovator</p>
-        <a href="Vytas_Resume.pdf" class="btn-resume" target="_blank">View Resume</a>
+        <p>Rising Junior Computer Engineer | UMass Amherst</p>
     </header>
     <nav>
         <a href="#about">About</a>
         <a href="#projects">Projects</a>
-        <a href="Vytas Resume (5).pdf" target="_blank">Resume</a>
+        <a href="Vytas_Resume.pdf" target="_blank">Resume</a>
     </nav>
     <div class="container">
         <section id="about" class="about">
@@ -121,14 +98,14 @@
             <h2>My Projects</h2>
             <div class="projects">
                 <div class="project">
-                    <img src="drone_project.jpg" alt="Drone Project">
+                    <img src="Drone_Project.jpg" alt="Drone Project">
                     <h3>Autonomous Drone</h3>
                     <p>Built an AI-powered autonomous drone with object detection and flight stabilization.</p>
                     <a href="https://github.com/vsubacius/AutonomousDrone/wiki" target="_blank">View on GitHub</a>
                 </div>
                 <div class="project">
-                    <img src="pulsr_ai.jpg" alt="PulsR AI">
-                    <h3>PulsR AI Platform</h3>
+                    <img src="pulsr_AI.png" alt="PulsR AI Project">
+                    <h3>PulsR AI Web Portal</h3>
                     <p>A Web3-powered AI platform for secure and decentralized access to private AI models.</p>
                     <a href="https://github.com/vsubacius/PulsRwebportal" target="_blank">View on GitHub</a>
                 </div>
@@ -136,19 +113,11 @@
         </section>
     </div>
     <footer>
-        <p>&copy; 2025 Vytas Subacius. All rights reserved.</p>
+        <p>&copy; 2025 Vytas Subacius</p>
         <div class="socials">
-            <a href="https://www.linkedin.com/in/vytas-subacius333/" target="_blank">LinkedIn</a>
             <a href="https://github.com/vsubacius" target="_blank">GitHub</a>
+            <a href="https://www.linkedin.com/in/vytas-subacius333/" target="_blank">LinkedIn</a>
         </div>
     </footer>
-
-    <script>
-        // Dynamic nature banner rotation every 10 seconds
-        setInterval(() => {
-            const banner = document.getElementById('banner');
-            banner.src = `https://source.unsplash.com/1600x900/?nature&t=${new Date().getTime()}`;
-        }, 10000);
-    </script>
 </body>
 </html>
