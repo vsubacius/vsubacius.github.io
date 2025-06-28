@@ -1,3 +1,18 @@
-# vsubacius.github.io
-Vytas Subacius' projects
-Hello those who might be reading this. This website is a collection of my projects for those who are interested! 
+# Next.js Portfolio
+
+## Development
+
+```bash
+npm run dev
+```
+
+## Build & Export
+
+For static export (e.g., GitHub Pages):
+
+```bash
+npm run build
+npm run export
+```
+
+Deploy the `out` folder to GitHub Pages or host on Vercel for best results.
