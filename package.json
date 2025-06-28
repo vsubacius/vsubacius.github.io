@@ -1,0 +1,29 @@
+{
+  "name": "vsubacius.github.io",
+  "version": "1.0.0",
+  "description": "Vytas Subacius' projects Hello those who might be reading this. This website is a collection of my projects for those who are interested!",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "export": "next build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "autoprefixer": "^10.4.21",
+    "framer-motion": "^12.19.2",
+    "next": "^15.3.4",
+    "postcss": "^8.5.6",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tailwindcss": "^4.1.11"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.11",
+    "@types/node": "^24.0.7",
+    "@types/react": "^19.1.8",
+    "typescript": "^5.8.3"
+  }
+}

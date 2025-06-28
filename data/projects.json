@@ -1,0 +1,16 @@
+[
+  {
+    "title": "Autonomous Drone",
+    "description": "Built an AI-powered autonomous drone with object detection and flight stabilization.",
+    "image": "/Drone_Project.jpg",
+    "repo": "https://github.com/vsubacius/AutonomousDrone/wiki",
+    "live": ""
+  },
+  {
+    "title": "PulsR AI Web Portal",
+    "description": "A Web3-powered AI platform for secure and decentralized access to private AI models.",
+    "image": "/pulsr_AI.png",
+    "repo": "https://github.com/vsubacius/PulsRwebportal",
+    "live": ""
+  }
+]
