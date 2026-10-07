@@ -140,7 +140,7 @@ tr.sel .ball{background:var(--accent);border-color:var(--accent);color:var(--acc
       <div><dt>Rev</dt><dd>A</dd></div>
       <div><dt>Units</dt><dd>mm</dd></div>
       <div><dt>Date</dt><dd>2026-10-05</dd></div>
-      <div><dt>Items</dt><dd>9</dd></div>
+      <div><dt>Items</dt><dd>10</dd></div>
     </dl>
   </header>
 
@@ -210,7 +210,9 @@ const PARTS = [
   {id:'batt', n:8, name:'LiPo cell', qty:'1', size:'50 × 34 × 7', src:'as', off:[0,-26,0], anc:[28,10,23],
    text:'Single-cell pouch, roughly 1000 mAh at this size, mounted under the hub. SDP lab rules require protection circuitry on lithium cells, so the hub carries a charger and protection IC.'},
   {id:'tray', n:9, name:'Bottom tray', qty:'1', size:'120 × 80 × 27', src:'as', off:[0,-60,0], anc:[42,27,40],
-   text:'Light PETG base with brass standoffs for the hub, rubber feet, front intake slots, rear exhaust slots and the power switch slot.'}
+   text:'Light PETG base with brass standoffs for the hub, rubber feet, the front intake opening behind the nose, rear exhaust slots and the power switch slot.'},
+  {id:'nose', n:10, name:'Nose intake', qty:'1', size:'31 × 25 × 15', src:'as', off:[0,-60,0], anc:[-31,12,52],
+   text:'Nose-shaped shroud over the front intake, mostly there for looks. Air is drawn in through the two nostrils, which glow green while the device samples, then passes the filter mesh into the sample chamber.'}
 ];
 const byId = {}; PARTS.forEach(p => byId[p.id] = p);
 const SRC = {ds:'Datasheet', as:'Assumed', pt:'Partial'};
@@ -364,7 +366,6 @@ function build3D(){
   (function(){ const g = G('tray'); const petg = M(0xd3d9d6, {roughness:.78}); const dark = M(0x111514, {roughness:.9}); const brass = M(0xb89a52, {metalness:.7, roughness:.38}); const rub = M(0x2a2d2c, {roughness:.95});
     slab(g, 120, 80, 2.5, 9, petg, 0, 0, 0);
     ring(g, 120, 80, 9, 2.5, 27, petg, 0, 0, 0);
-    for (let i = 0; i < 7; i++) B(g, 1.8, 9, .8, dark, -31 + (i-3)*3.2, 16, 39.9);
     for (let i = 0; i < 5; i++) B(g, 18, 1.8, .8, dark, -31, 7.5 + i*4, -39.9);
     B(g, 8.6, 3.6, .8, dark, 40, 14.8, 39.9);
     HOLES.forEach(([x,z]) => cyl(g, 2.6, 10.5, brass, x, 2.5, z));
@@ -379,6 +380,46 @@ function build3D(){
     const pipe = M(0xcdeedb, {emissive:0x3dbb78, emissiveIntensity:.55, roughness:.2, transparent:true, opacity:.85});
     cyl(g, 1.4, 29.4, pipe, 48, 15.3, 31, 16);
     decal(g, 46, 13, canvasTex(46, 13, 12, drawLid), -6, 44.06, 6);
+  })();
+
+  /* 10 Nose intake */
+  let noseGlow = [];
+  (function(){ const g = G('nose'); const cx = -31, z0 = 39.4;
+    /* rows top to bottom: y, tip half-width, tip depth, wing depth, wing centre, wing half-width */
+    const R = [[26.6,3.8,0,0,7,4],[26.3,4.2,1.6,0,7,4],[24,4.6,3.6,0,7,4],[20,5.2,6.6,0,7,4],[16,6,9.6,0,7,4],[12.6,7,12.4,2.6,7,5],
+      [10.2,7.8,14.4,6.4,8.4,6],[8,7.8,15,8.4,9,6.4],[6.2,7.4,14.8,8.8,9,6.5],[4.6,6.8,13.6,8.4,8.8,6.3],[3.6,5.8,10,6.4,8.4,5.8],[3,4.4,5,3.2,8,5],[2.8,3.6,0,0,8,5]];
+    const cr = (p0,p1,p2,p3,t) => { const t2 = t*t, t3 = t2*t; return .5*((2*p1) + (-p0+p2)*t + (2*p0-5*p1+4*p2-p3)*t2 + (-p0+3*p1-3*p2+p3)*t3); };
+    const rows = [];
+    for (let i = 0; i < R.length - 1; i++) for (let k = 0; k < 8; k++){ const t = k/8, A = R[Math.max(i-1,0)], B0 = R[i], C = R[i+1], Dd = R[Math.min(i+2,R.length-1)];
+      rows.push(B0.map((_, j) => Math.max(j === 0 ? -1e9 : 0, cr(A[j], B0[j], C[j], Dd[j], t)))); }
+    rows.push(R[R.length-1].slice());
+    const NX = 180, posA = [], idx = [];
+    const sm = (a, b) => Math.pow(Math.pow(a, 4) + Math.pow(b, 4), .25);
+    const W = 15.5; rows.forEach(([y, wt, dt, da, xa, wa]) => {
+      for (let j = 0; j <= NX; j++){ const x = -W + 2*W*j/NX; const ax = Math.abs(x);
+        const tip = dt * Math.sqrt(Math.max(0, 1 - (x/wt)*(x/wt))); const wing = da * Math.sqrt(Math.max(0, 1 - ((ax-xa)/wa)*((ax-xa)/wa)));
+        posA.push(cx + x, y, z0 + sm(tip, wing)); } });
+    for (let i = 0; i < rows.length - 1; i++) for (let j = 0; j < NX; j++){ const a = i*(NX+1)+j, b = a + NX + 1; idx.push(a, a+1, b, b, a+1, b+1); }
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(posA, 3)); geo.setIndex(idx); geo.computeVertexNormals();
+    const skin = M(0x2f3734, {roughness:.48, side:THREE.DoubleSide});
+    const body = add(g, geo, skin); body.updateMatrixWorld();
+    const c = document.createElement('canvas'); c.width = 160; c.height = 100; const x = c.getContext('2d');
+    const gr = x.createRadialGradient(80, 50, 0, 80, 50, 50);
+    gr.addColorStop(0, 'rgba(3,8,6,1)'); gr.addColorStop(.55, 'rgba(8,24,15,1)'); gr.addColorStop(.8, 'rgba(70,220,140,1)'); gr.addColorStop(1, 'rgba(70,220,140,0)');
+    x.setTransform(1, 0, 0, .62, 0, 19); x.fillStyle = gr; x.beginPath(); x.arc(80, 50, 50, 0, Math.PI*2); x.fill();
+    const tex = new THREE.CanvasTexture(c);
+    const ray = new THREE.Raycaster(); const nrm = new THREE.Vector3();
+    ray.set(new THREE.Vector3(cx + 3.7, -2.6, 80), new THREE.Vector3(0, .32, -1).normalize());
+    const hit = ray.intersectObject(body)[0];
+    if (hit){
+      nrm.copy(hit.face.normal).transformDirection(body.matrixWorld); if (nrm.z < 0) nrm.negate();
+      [-1, 1].forEach(sx => {
+        const mat = new THREE.MeshBasicMaterial({map:tex, transparent:true, depthWrite:false, polygonOffset:true, polygonOffsetFactor:-4});
+        const d = new THREE.Mesh(new THREE.PlaneGeometry(5.4, 5.4), mat); const n = nrm.clone(); n.x *= sx;
+        d.position.set(cx + sx * (hit.point.x - cx), hit.point.y, hit.point.z).addScaledVector(n, .08);
+        d.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), n); d.rotateZ(sx * .22); g.add(d); noseGlow.push(mat);
+      });
+    }
   })();
 
   /* 7 Hub PCB */
@@ -472,7 +513,7 @@ function build3D(){
   })();
 
   /* Airflow */
-  const curve = new THREE.CatmullRomCurve3([[-31,20.5,64],[-31,20.5,42],[-31,21,32],[-34,23.5,20],[-29,25,7],[-33,24,-6],[-31,22,-16],[-31,20,-23],[-31,17,-31],[-31,17,-44],[-31,17,-68]].map(a => new THREE.Vector3(a[0], a[1], a[2])), false, 'centripetal');
+  const curve = new THREE.CatmullRomCurve3([[-31,-6,66],[-31,-1,56],[-31,4,47],[-31,12,41],[-31,21,32],[-34,23.5,20],[-29,25,7],[-33,24,-6],[-31,22,-16],[-31,20,-23],[-31,17,-31],[-31,17,-44],[-31,17,-68]].map(a => new THREE.Vector3(a[0], a[1], a[2])), false, 'centripetal');
   const N = 90; const pArr = new Float32Array(N*3); const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute('position', new THREE.BufferAttribute(pArr, 3));
   const seeds = []; for (let i = 0; i < N; i++) seeds.push({p: i/N, a: Math.random()*2-1, b: Math.random()*2-1});
   const sprite = (function(){ const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'); const gr = g.createRadialGradient(32,32,0,32,32,32); gr.addColorStop(0,'rgba(255,255,255,1)'); gr.addColorStop(.45,'rgba(255,255,255,.85)'); gr.addColorStop(1,'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0,0,64,64); return new THREE.CanvasTexture(c); })();
@@ -561,6 +602,7 @@ function build3D(){
     pMat.opacity = aop; pLineMat.opacity = aop*.35; pts.visible = pLine.visible = aop > .01;
     if (pts.visible){ if (!reduce) time += dt; updParticles(); }
     if (state.air) blades.rotation.z += dt * (reduce ? 3 : 16);
+    noseGlow.forEach(m => { m.opacity = state.air && !reduce ? .7 + .3 * Math.sin(clock.elapsedTime * 5) : 1; });
     controls.autoRotate = state.spin; controls.update();
     renderer.render(scene, camera);
     placeCallouts();
@@ -582,8 +624,8 @@ function renderDetail(){
   const d = $('detail'); const p = state.sel && byId[state.sel];
   if (!p){
     d.innerHTML = '<p class="eyebrow">Air path</p><h3>Front in, back out</h3>' +
-      '<ol class="flow"><li>Intake slots</li><li>Sample chamber</li><li>Exhaust fan</li><li>Rear slots</li></ol>' +
-      '<p>Air enters the front slots, passes through the sealed chamber over the BME690 and ENS160 sensors, then leaves through the fan at the back. The fan sits downstream, so its motor heat and smell stay out of the sample.</p>' +
+      '<ol class="flow"><li>Nostrils</li><li>Sample chamber</li><li>Exhaust fan</li><li>Rear slots</li></ol>' +
+      '<p>Air enters through the nose at the front, passes through the sealed chamber over the BME690 and ENS160 sensors, then leaves through the fan at the back. The fan sits downstream, so its motor heat and smell stay out of the sample.</p>' +
       '<button type="button" class="btn" id="dAir">' + (state.air ? 'Hide airflow' : 'Show airflow') + '</button>' +
       '<p class="hint-s">Tap a part or a balloon for its details.</p>';
     $('dAir').addEventListener('click', toggleAir); return;
