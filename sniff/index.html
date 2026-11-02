@@ -124,10 +124,28 @@ tr.sel .ball{background:var(--accent);border-color:var(--accent);color:var(--acc
 .src.pt::before{background:linear-gradient(90deg,var(--accent) 50%,var(--warn) 50%)}
 .note{margin:0;font-size:13.5px;color:var(--ink-2);max-width:62ch}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
-</style>
-</head>
-<body>
 
+/* Rev B additions */
+:root{--odor:#b4560f}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--odor:#f0a35a}}
+:root[data-theme="dark"]{--odor:#f0a35a}
+.seg.seg3{grid-template-columns:1fr 1fr 1fr}
+.flow li.hot{color:var(--accent);font-weight:600}
+.phases{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;width:100%}
+.phases li{border-top:3px solid var(--rule);padding-top:6px;font:500 12px/1.25 var(--f-mono);color:var(--ink-2);min-width:0}
+.phases b{display:block;font:600 13px/1.1 var(--f-display);letter-spacing:.06em;text-transform:uppercase}
+.phases li.now{border-top-color:var(--accent);color:var(--ink)}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px}
+.dec{display:flex;flex-direction:column;gap:10px;margin:0}
+.dec dt{font-weight:600;line-height:1.3}
+.dec dd{margin:2px 0 0;color:var(--ink-2);font-size:14px;line-height:1.45;max-width:62ch}
+table.plain tbody tr{cursor:default}
+table.plain tbody tr:hover{background:none}
+table.plain td:last-child{text-align:right}
+table.hubt td:last-child{text-align:left}
+table.hubt td{font-size:13.5px;vertical-align:top}
+.src.es::before{background:linear-gradient(90deg,var(--accent) 50%,var(--warn) 50%)}
+</style>
 
 <div class="wrap">
   <header class="titlebar">
@@ -137,10 +155,10 @@ tr.sel .ball{background:var(--accent);border-color:var(--accent);color:var(--acc
       <p class="tb-sub">Sensor Network for Intelligent Fragrance Fingerprinting</p>
     </div>
     <dl class="tb-cells">
-      <div><dt>Rev</dt><dd>A</dd></div>
+      <div><dt>Rev</dt><dd>B</dd></div>
       <div><dt>Units</dt><dd>mm</dd></div>
-      <div><dt>Date</dt><dd>2026-10-05</dd></div>
-      <div><dt>Items</dt><dd>10</dd></div>
+      <div><dt>Date</dt><dd>2026-11-01</dd></div>
+      <div><dt>Items</dt><dd>17</dd></div>
     </dl>
   </header>
 
@@ -160,15 +178,73 @@ tr.sel .ball{background:var(--accent);border-color:var(--accent);color:var(--acc
           <button type="button" id="btnAsm" aria-pressed="false">Assembled</button>
           <button type="button" id="btnExp" aria-pressed="false">Fully exploded</button>
         </div>
+        <div class="row"><span class="label" id="vLab">Valve position</span></div>
+        <div class="seg seg3" role="group" aria-labelledby="vLab">
+          <button type="button" id="vRef" aria-pressed="true">Clean air</button>
+          <button type="button" id="vHold" aria-pressed="false">Hold</button>
+          <button type="button" id="vSamp" aria-pressed="false">Sample</button>
+        </div>
         <div class="toggles">
-          <button type="button" class="tog" id="tSee" aria-pressed="false">See-through shell</button>
+          <button type="button" class="tog" id="tSee" aria-pressed="false">See-through</button>
           <button type="button" class="tog" id="tAir" aria-pressed="false">Airflow</button>
+          <button type="button" class="tog" id="tWire" aria-pressed="false">Hub wiring</button>
           <button type="button" class="tog" id="tBal" aria-pressed="true">Balloons</button>
           <button type="button" class="tog" id="tSpin" aria-pressed="false">Spin</button>
         </div>
       </section>
 
       <section class="detail" id="detail" aria-live="polite"></section>
+
+      <section class="bom" aria-labelledby="dH">
+        <h2 id="dH">Air path decisions</h2>
+        <dl class="dec">
+          <div><dt>Pump pulls from behind the sensors</dt><dd>The pump's inlet connects after the chamber, so its heat, motor smell and pulses stay out of the sample. Exhaust leaves at the rear, far from the nostrils.</dd></div>
+          <div><dt>Two nostrils, one job each</dt><dd>The sample side has only a dust filter. The clean-air side holds about 1.8 g of activated carbon between two particle filters. It screws out for replacement.</dd></div>
+          <div><dt>Servo turns a 3-way valve</dt><dd>A sliding shutter would connect the two nostrils and leak room air, so the servo turns a sealed Luer stopcock instead. It holds position with the servo unpowered and adds a third state that seals the chamber.</dd></div>
+          <div><dt>A small restriction sets the flow</dt><dd>A 25 G dispensing tip drops about 13 kPa at 300 mL/min, while the carbon bed drops about 6 Pa. The tip dominates, so both nostrils draw nearly the same flow and the sensors see no cooling step when the valve moves.</dd></div>
+          <div><dt>Buffer smooths the pulses</dt><dd>A 13 mL volume between the tip and the pump acts as a pneumatic low-pass filter, with a corner near 0.5 Hz, well below the pump's pulse rate.</dd></div>
+          <div><dt>Only the Figaro cans enter the chamber</dt><dd>Each module sits upside down on the chamber lid with its can sealed through a hole. The trimmer, comparator and flux stay outside the sample.</dd></div>
+          <div><dt>BME690s come first</dt><dd>Hot MOX cans warm the air and burn off a little of the odor, so the BME690s read it upstream of them.</dd></div>
+          <div><dt>Pump runs from the battery</dt><dd>The datasheet use range is 3.0–4.5 V, so a 5 V rail is outside it. Battery power also keeps motor noise off the 5 V heater rail.</dd></div>
+        </dl>
+      </section>
+
+      <section class="bom" aria-labelledby="cH">
+        <h2 id="cH">Calculated targets</h2>
+        <div class="tablewrap">
+          <table class="plain">
+            <tbody>
+              <tr><td>Flow</td><td class="mono">300 mL/min</td></tr>
+              <tr><td>Chamber volume, net</td><td class="mono">≈ 20 mL</td></tr>
+              <tr><td>Time for one air change</td><td class="mono">≈ 4 s</td></tr>
+              <tr><td>Time to 95% new air</td><td class="mono">≈ 12 s</td></tr>
+              <tr><td>Carbon contact time</td><td class="mono">≈ 0.8 s</td></tr>
+              <tr><td>Average power</td><td class="mono">≈ 2.3 W</td></tr>
+              <tr><td>Runtime on one 18650</td><td class="mono">≈ 5 h</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">These are hand calculations for a starting point. Measure flow and pump current on the bench before relying on them.</p>
+      </section>
+
+      <section class="bom" aria-labelledby="hH">
+        <h2 id="hH">What plugs into the hub</h2>
+        <div class="tablewrap">
+          <table class="plain hubt">
+            <thead><tr><th scope="col">Conn.</th><th scope="col">Device</th><th scope="col">Hub side</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">J1</td><td>BME690 shuttle</td><td>3.3 V sensor rail, VSPI, 8 CS lines</td></tr>
+              <tr><td class="mono">J10–13</td><td>Figaro modules</td><td>5 V heater rail, AOUT through a 2:1 divider to ADS1115 A0–A3</td></tr>
+              <tr><td class="mono">U3</td><td>ADS1115</td><td>I²C on GPIO21/22</td></tr>
+              <tr><td class="mono">J20</td><td>18650 cell</td><td>Protection, charger, power switch</td></tr>
+              <tr><td class="mono">J21</td><td>Pump</td><td>Battery rail, Q1 and flyback diode, PWM on GPIO4</td></tr>
+              <tr><td class="mono">J22</td><td>Servo</td><td>5 V through load switch Q2 on GPIO2, signal on GPIO14</td></tr>
+              <tr><td class="mono">U1</td><td>ESP32 devkit</td><td>Stacked on headers; battery sense on GPIO34</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">GPIO choices avoid the pins already proposed for the shuttle. Using GPIO4 for the pump gives up the optional shuttle EEPROM read.</p>
+      </section>
 
       <section class="bom" aria-labelledby="bomH">
         <h2 id="bomH">Bill of materials</h2>
@@ -178,7 +254,7 @@ tr.sel .ball{background:var(--accent);border-color:var(--accent);color:var(--acc
             <tbody id="bomBody"></tbody>
           </table>
         </div>
-        <p class="note">Shuttle board, ENS160 package and ESP32 module sizes come from their datasheets. Parts marked Assumed use placeholder sizes chosen to make the layout work; swap in real parts as the team picks them.</p>
+        <p class="note">Pump, shuttle board, ESP32 module and Figaro can sizes come from datasheets. The Figaro module board is estimated from your photo, so measure it before printing mounts. Parts marked Assumed use placeholder sizes.</p>
       </section>
     </aside>
   </main>
@@ -191,84 +267,130 @@ tr.sel .ball{background:var(--accent);border-color:var(--accent);color:var(--acc
 'use strict';
 const $ = id => document.getElementById(id);
 
-/* Parts: offsets are the fully exploded translation (mm), anchors are balloon points in assembled coords */
+/* ---------- Dimensions you will want to change once parts are measured (mm) ---------- */
+const FIG = {L:32, W:20, T:1.6,          /* module board: ESTIMATED from the photo */
+             endOff:10, legs:7,          /* can centre from board end, visible leg length: ESTIMATED */
+             flD:9.2, canD:8.1, canH:7.8,/* TO-5 can: Figaro datasheet */
+             x:11, zs:[-24,-46], names:['TGS2603','TGS2602','TGS2620','TGS2600']};
+const AY = 38.6;                         /* air path height, also the nostril axis */
+const NX = 15;                           /* nostril offset from centre */
+
+/* Parts: off = fully exploded translation, anc = balloon point in assembled coords */
 const PARTS = [
-  {id:'lid', n:1, name:'Top shell', qty:'1', size:'120 × 80 × 17', src:'as', off:[0,72,0], anc:[-40,44,36],
-   text:'Charcoal PETG lid that snaps onto the tray at the parting line. A light pipe carries the status LED to the top, and a notch in the right wall clears the ESP32’s USB port.'},
-  {id:'chamber', n:2, name:'Sample chamber', qty:'1', size:'38 × 50 × 15', src:'as', off:[0,48,0], anc:[-50,30,18],
-   text:'Clear printed or acrylic box sealed to the hub PCB with a foam gasket. It holds the sample around the sensors and away from ESP32 and charger heat. A short nozzle with filter mesh feeds it from the front slots, and a rear port leads to the fan.'},
-  {id:'fan', n:3, name:'Exhaust fan', qty:'1', size:'25 × 25 × 10', src:'as', off:[-48,14,-6], anc:[-43.5,29.5,-26],
-   text:'5 V axial fan on the outlet side, pulling air through the chamber and out the rear slots. Placing it downstream keeps its motor heat and smell out of the sample.'},
-  {id:'bme', n:4, name:'BME690 8× shuttle board', qty:'1', size:'20 × 22 × 1.7', src:'ds', off:[0,30,0], anc:[-48,21.2,16],
-   text:'Bosch Shuttle Board 3.0 with eight BME690 sensors on a 3 × 3 grid; the ninth spot holds the regulator (U10). Two 1.27 mm headers, 17.78 mm apart, plug into socket J1 on the hub.'},
-  {id:'ens', n:5, name:'ENS160 array', qty:'4', size:'3 × 3 × 0.9 each', src:'pt', off:[0,16,0], anc:[-15.5,15.5,11.5],
-   text:'ScioSense MOX gas sensors soldered to the hub beside the shuttle socket, inside the chamber’s gasket line, each with local decoupling. Four is a placeholder count.'},
-  {id:'esp', n:6, name:'ESP32 devkit', qty:'1', size:'51 × 25.5 board', src:'pt', off:[0,36,0], anc:[40,27.2,16.75],
-   text:'ESP32-WROOM-32D (18 × 25.5 × 3.1 mm, from its datasheet) on a devkit carrier, stacked into female headers on the hub. The antenna end sits away from the battery and the USB port faces the right wall.'},
-  {id:'hub', n:7, name:'Hub PCB', qty:'1', size:'112 × 60 × 1.6', src:'as', off:[0,0,0], anc:[30,14.6,36],
-   text:'The team’s custom board. It routes the shuttle socket and the ENS160s to the ESP32 headers, and carries the LiPo charger with protection, the 3.3 V regulator, the power switch, the fan header and the status LED.'},
-  {id:'batt', n:8, name:'LiPo cell', qty:'1', size:'50 × 34 × 7', src:'as', off:[0,-26,0], anc:[28,10,23],
-   text:'Single-cell pouch, roughly 1000 mAh at this size, mounted under the hub. SDP lab rules require protection circuitry on lithium cells, so the hub carries a charger and protection IC.'},
-  {id:'tray', n:9, name:'Bottom tray', qty:'1', size:'120 × 80 × 27', src:'as', off:[0,-60,0], anc:[42,27,40],
-   text:'Light PETG base with brass standoffs for the hub, rubber feet, the front intake opening behind the nose, rear exhaust slots and the power switch slot.'},
-  {id:'nose', n:10, name:'Nose intake', qty:'1', size:'31 × 25 × 15', src:'as', off:[0,-60,0], anc:[-31,12,52],
-   text:'Nose-shaped shroud over the front intake, mostly there for looks. Air is drawn in through the two nostrils, which glow green while the device samples, then passes the filter mesh into the sample chamber.'}
+  {id:'lid', n:1, name:'Top shell', qty:'1', size:'136 × 130 × 27', src:'as', off:[0,172,0], anc:[-44,63,30],
+   text:'Charcoal PETG cover that lifts straight off. Every part mounts to the tray, so you can reach the chamber without unplugging anything. The rear slot clears the ESP32 USB port.'},
+  {id:'tray', n:2, name:'Bottom tray', qty:'1', size:'136 × 130 × 36', src:'as', off:[0,-96,0], anc:[-54,6,65],
+   text:'Light PETG base with brass hub standoffs, rubber feet, a foam saddle for the pump, and exhaust slots in the rear wall. The front window takes the nose assembly.'},
+  {id:'shroud', n:3, name:'Nose shroud', qty:'1', size:'68 × 32 × 28', src:'as', off:[0,0,126], anc:[0,50,74],
+   text:'Printed nose that bolts over the front window and locates both nostrils. It is cosmetic and carries no air, so you can restyle it without touching the air path.'},
+  {id:'noseS', n:4, name:'Sample nostril', qty:'1', size:'Ø24.4 × 46', src:'as', off:[0,0,80], anc:[-15,50,62],
+   text:'A cone narrows from 22 mm to 14 mm so a vial, swab or food sample can sit against it without much room air mixing in. Behind the cone is a steel mesh and a PTFE membrane disc for dust. There is no adsorbent here, because anything added would strip the odor.'},
+  {id:'noseR', n:5, name:'Clean-air nostril', qty:'1', size:'Ø24.4 × 46', src:'as', off:[0,0,80], anc:[15,50,62],
+   text:'Same cone, packed from front to back with a particle pad, about 1.8 g of granular activated carbon, and a retainer pad that stops carbon dust reaching the sensors. It screws out for replacement. Avoid silica gel or other desiccants here: dry reference air would swing the MOX baseline.'},
+  {id:'valve', n:6, name:'3-way stopcock', qty:'1', size:'Ø12 body, Luer ports', src:'as', off:[0,26,46], anc:[0,46,28],
+   text:'A sealed T-bore plug selects a nostril. The closed nostril also stops breathing through the carbon, which extends the filter’s life. Halfway between the two positions it blocks the chamber port, giving the Hold state. Medical Luer stopcocks are cheap and fit standard Luer tubing. Move to a PTFE lab stopcock if you see odor carryover.'},
+  {id:'servo', n:7, name:'MG90S servo', qty:'1', size:'22.8 × 12.2 × 29', src:'as', off:[0,-42,66], anc:[8,20,40],
+   text:'Sits below the hub and turns the stopcock through a coupler. It travels 180° from clean air to sample, and the chamber port closes at the midpoint, so one nostril is fully shut before the other opens. The hub cuts servo power once it arrives, which removes its noise and heat during measurement.'},
+  {id:'chamber', n:8, name:'Sensor chamber', qty:'1', size:'40 × 76 × 13', src:'as', off:[0,60,0], anc:[-19,47,4],
+   text:'A flow cell that seals to the hub with a gasket, with about 20 mL of air space. Air enters at the front, crosses the BME690s, passes the four Figaro cans, and leaves through a port in the hub. Mill it from aluminum if you can get shop time. Otherwise use epoxy-coated PETG, because bare prints absorb and release odor.'},
+  {id:'bme', n:9, name:'BME690 8× shuttle board', qty:'1', size:'20 × 22 × 1.7', src:'ds', off:[0,27,0], anc:[0,41,10],
+   text:'Eight BME690 sensors at the upstream end of the chamber. The two 1.27 mm headers plug straight into socket J1 on the hub. They also report temperature, humidity and chamber pressure, which gives you a free check for a clogged filter or a leak.'},
+  {id:'fig', n:10, name:'Figaro modules', qty:'4', size:'≈ 32 × 20 board, can Ø9.2 × 7.8', src:'es', off:[0,108,0], anc:[-30,56,-24],
+   text:'The AliExpress breakout boards, mounted upside down on the lid with each can sealed on an O-ring. Each module sends VCC, GND and AOUT to the hub. The comparator output (DOUT) is unused. Four modules and the 2603, 2602, 2620 and 2600 mix are my assumption, and the layout adds a row easily.'},
+  {id:'hub', n:11, name:'Hub PCB', qty:'1', size:'128 × 122 × 1.6', src:'as', off:[0,0,0], anc:[-55,34,50],
+   text:'Everything terminates here. It also forms the chamber floor. It carries the shuttle socket, Figaro connectors, ADS1115, battery charger and protection, heater boost converter, sensor LDO, pump MOSFET and servo load switch. The pump, servo and battery connectors are on the underside, and a notch at the front clears the nostrils. An unpopulated ENS160 footprint is reserved inside the chamber.'},
+  {id:'esp', n:12, name:'ESP32 devkit', qty:'1', size:'51 × 25.5 board', src:'pt', off:[0,46,0], anc:[50,47,-20],
+   text:'ESP32-WROOM-32D module (18 × 25.5 × 3.1 mm, from its datasheet) on a devkit, stacked into headers on the hub outside the chamber. The USB port faces the rear wall, and the antenna end faces forward, away from the pump and battery.'},
+  {id:'batt', n:13, name:'18650 cell + holder', qty:'1', size:'77 × 21 × 20', src:'as', off:[0,-54,26], anc:[-30,23,-11],
+   text:'Replaces the 1000 mAh pouch from Rev A. Four heaters add about a watt, so that pouch would last only 1.5 hours. A protected 3400 mAh cell gives about 5 hours. SDP rules require protection circuitry on lithium cells, so use a protected cell or add protection on the hub.'},
+  {id:'rest', n:14, name:'Flow restrictor + buffer', qty:'1', size:'25 G tip, 38 × 22 × 24 buffer', src:'as', off:[-118,-22,-6], anc:[-41,28,-43],
+   text:'A 25 G dispensing tip sets the flow and isolates the chamber from the pump. The sealed 13 mL buffer behind it smooths the pump’s pulses. Tips are cheap and push-fit, so you can tune flow by swapping gauge or length. A 23 G tip passes more air for the same pump vacuum.'},
+  {id:'pump', n:15, name:'ZR320-02PM vacuum pump', qty:'1', size:'Ø27 × 45.3', src:'ds', off:[126,-26,38], anc:[38,31,-44],
+   text:'Adafruit 4700. The side inlet connects to the buffer and the end outlet vents through the rear wall. It runs from the battery with PWM and rests on foam so vibration stays off the hub. Adafruit recommends about a 50% duty cycle, so run it only during a sniff cycle and rest it between cycles.'},
+  {id:'tubes', n:16, name:'Air tubing', qty:'1 set', size:'3 mm ID', src:'as', off:[0,0,0], anc:[-12,AY,33],
+   text:'Use FEP or PTFE tube on the sensor side of the chamber, because silicone absorbs odor and releases it later. Silicone tube is fine after the chamber. Keep the runs short and the same length on both sides.'},
+  {id:'wires', n:17, name:'Wiring harness', qty:'1 set', size:'22–26 AWG', src:'as', off:[0,0,0], anc:[-44,44,-46],
+   text:'Three wires from each Figaro module, two from the pump, three from the servo and two from the battery. Everything meets at the hub. Route the pump leads away from the Figaro signal wires.'}
 ];
 const byId = {}; PARTS.forEach(p => byId[p.id] = p);
-const SRC = {ds:'Datasheet', as:'Assumed', pt:'Partial'};
+const SRC = {ds:'Datasheet', as:'Assumed', pt:'Partial', es:'Estimated'};
 
-const ENS = [[-23,0],[-17,0],[-23,10],[-17,10]];
 const SENS = [[-6,-4.6],[0,-4.6],[6,-4.6],[-6,.6],[0,.6],[6,.6],[0,5.8],[6,5.8]];
-const HOLES = [[-53,-20],[53,-20],[-53,32],[53,32]];
+const HOLES = [[-60,-57],[60,-57],[-60,57],[60,57]];
+const HT = 33.6;              /* hub top surface */
+const ESPX = 50, ESPZ = -34.5;
+
+/* Valve: angle of the T-bore. The solid side points at the blocked port. */
+const VALVE = {
+  ref:{a: Math.PI/2, name:'Clean air', title:'Clean air', air:'ref',
+    flow:['Clean-air nostril','Carbon filter','Valve','Chamber','Restrictor','Buffer','Pump','Rear vent'],
+    text:'Air passes through the carbon first, so the sensors settle on a clean reference. This is the state used for the baseline and for the purge after a sample.'},
+  hold:{a:0, name:'Hold', title:'Hold', air:'hold',
+    flow:['Valve closed','Pump off','Chamber sealed'],
+    text:'The valve blocks the chamber port and the pump stops, so sensors read a trapped sample in still air with no flow cooling. Run the pump in this position to pull a vacuum, and the BME690 pressure reading becomes a leak test.'},
+  samp:{a:-Math.PI/2, name:'Sample', title:'Sample', air:'samp',
+    flow:['Sample nostril','Dust filter','Valve','Chamber','Restrictor','Buffer','Pump','Rear vent'],
+    text:'Air enters through the open cone and reaches the sensors with only a dust filter in the way. The flow is the same as the clean-air state, so the sensors respond to the odor and not to a change in flow.'}
+};
+const PHASES = [{v:'ref',label:'Baseline',s:30},{v:'samp',label:'Sample',s:30},{v:'hold',label:'Hold',s:15},{v:'ref',label:'Purge',s:60}];
 
 const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const state = {e: reduce ? .75 : 0, eT: .75, see:false, air:false, balls:true, spin:false, sel:null};
+const state = {e: reduce ? .75 : 0, eT: .75, see:false, air:false, wire:false, balls:true, spin:false, sel:null, valve:'ref', va:VALVE.ref.a, cycle:-1, cycleT:0};
 
 /* ---------- canvas drawings (units: mm) ---------- */
 const FD = '"Barlow Condensed","Arial Narrow",sans-serif', FM = '"IBM Plex Mono",monospace';
 function rrPath(g, x, y, w, h, r){ g.beginPath(); g.moveTo(x+r,y); g.lineTo(x+w-r,y); g.quadraticCurveTo(x+w,y,x+w,y+r); g.lineTo(x+w,y+h-r); g.quadraticCurveTo(x+w,y+h,x+w-r,y+h); g.lineTo(x+r,y+h); g.quadraticCurveTo(x,y+h,x,y+h-r); g.lineTo(x,y+r); g.quadraticCurveTo(x,y,x+r,y); g.closePath(); }
 
 function drawHub(g){
-  g.translate(56, 24);
-  g.fillStyle = '#1c5a3c'; g.fillRect(-56,-24,112,60);
+  g.translate(64, 61);
+  g.fillStyle = '#1c5a3c'; g.fillRect(-64,-61,128,122);
   g.lineCap = 'round'; g.lineJoin = 'round';
   const line = (pts, w, c) => { g.strokeStyle = c; g.lineWidth = w; g.beginPath(); g.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) g.lineTo(pts[i][0], pts[i][1]); g.stroke(); };
-  const TR = '#2b7752', PW = '#318259';
-  line([[-36.73,-3.9],[-36.73,-11],[-6,-11],[2,-13.5],[14.54,-13.5],[14.54,-7.43]], .45, TR);
-  line([[-35.46,-3.9],[-35.46,-12.2],[-6.5,-12.2],[1.5,-14.7],[17.08,-14.7],[17.08,-7.43]], .45, TR);
-  line([[-23,-1.5],[-23,-11]], .4, TR); line([[-17,-1.5],[-17,-12.2]], .4, TR);
-  for (let k = 0; k < 3; k++){ const x0 = -38 + k*1.27, zz = 19.5 + k*1.3, xe = 12 + k*2.54; line([[x0,15.2],[x0,zz],[xe,zz],[xe,15.43]], .45, TR); }
-  line([[13,-16],[33.8,-16]], .9, PW); line([[40.2,-16],[43.5,-16]], .9, PW); line([[46.5,-16],[47.6,-14],[47.6,-7.43]], .9, PW);
-  line([[-3,-18],[-1,-21.5],[37,-21.5],[37,-17.8]], .7, PW);
-  line([[40,32.7],[40,25],[47.6,19],[47.6,15.43]], .7, PW);
-  line([[48,30.5],[52,26],[52,18]], .4, TR);
+  const TR = '#2b7752', PW = '#34885e';
+  /* SPI and chip selects from J1 to the ESP32 headers */
+  for (let i = 0; i < 7; i++){ const x = -7.6 + i*1.27, zz = -14.2 - i*.9; line([[x,-8.9],[x,zz],[26+i*.9,zz],[26+i*.9,-20],[38.6,-22-i*2.54]], .32, TR); }
+  for (let i = 0; i < 9; i++){ const x = -5 + i*1.27, zz = 14.2 + i*.8; line([[x,8.9],[x,zz],[30+i*.5,zz],[34,-6-i],[38.6,-14-i*2.54]], .32, TR); }
+  /* Figaro AOUT to ADS1115 */
+  line([[-42,-24],[-52,-24],[-52,16],[28,16.5],[30,24]], .35, TR);
+  line([[-42,-46],[-54,-46],[-54,17.5],[29,17.5],[31.5,24]], .35, TR);
+  line([[40,5],[40,16],[33,24]], .35, TR); line([[50,5],[50,17],[34.5,24]], .35, TR);
+  /* I2C to the ESP32 */
+  line([[38,27],[47,27],[61.4,8],[61.4,-20]], .35, TR); line([[38,29],[48,29],[62.6,9],[62.6,-24]], .35, TR);
+  /* Power rails */
+  line([[-34,48],[-30,34],[26,34],[44,20],[44,5]], 1, PW);
+  line([[-42,-24],[-40,-30],[-40,-46]], .8, PW);
+  line([[-34,44],[-30,20],[-46,14],[-46,-24]], .8, PW);
+  line([[-50,34],[-58,34]], 1.2, PW); line([[-50,34],[-34,44]], 1, PW);
   const GOLD = '#cfa94f';
   const pad = (x,z,w,h) => { g.fillStyle = GOLD; g.fillRect(x-w/2, z-h/2, w, h); };
   const dot = (x,z,r,c) => { g.fillStyle = c; g.beginPath(); g.arc(x,z,r,0,Math.PI*2); g.fill(); };
-  for (let i = 0; i < 7; i++) pad(-38+(i-3)*1.27, -3.89, .8, 1.6);
-  for (let i = 0; i < 9; i++) pad(-38+(i-4)*1.27, 13.89, .8, 1.6);
-  for (let i = 0; i < 15; i++) [-7.43, 15.43].forEach(z => { dot(12+i*2.54, z, .9, GOLD); dot(12+i*2.54, z, .45, '#0e2a1d'); });
-  ENS.forEach(([x,z]) => { for (let a = 0; a < 2; a++) for (let b = 0; b < 2; b++) pad(x-1+a*2, z-1+b*2, .7, .7); });
+  for (let i = 0; i < 7; i++) pad((i-3)*1.27, -8.89, .8, 1.6);
+  for (let i = 0; i < 9; i++) pad((i-4)*1.27, 8.89, .8, 1.6);
+  for (let i = 0; i < 15; i++) [ESPX-11.43, ESPX+11.43].forEach(x => { const z = ESPZ + (i-7)*2.54; dot(x, z, .9, GOLD); dot(x, z, .45, '#0e2a1d'); });
+  /* reserved ENS160 land pattern */
+  for (let a = 0; a < 2; a++) for (let b = 0; b < 2; b++) pad(13-1+a*2, 0-1+b*2, .7, .7);
   g.globalAlpha = .85;
-  [[45,-16,3.6,3.6],[37,-16,7,4],[10,-16,6.6,5],[-6,-18,6.6,5],[40,34.5,9,4],[48,31,2,1.2]].forEach(([x,z,w,h]) => pad(x,z,w,h));
+  [[34,27,9,7],[-34,44,8,8],[-50,34,6,6],[24,40,6,4],[28,-24,5,4],[22,-14,4,3],[20,30,4,3]].forEach(([x,z,w,h]) => pad(x,z,w,h));
   g.globalAlpha = 1;
   HOLES.forEach(([x,z]) => { dot(x,z,2.8,GOLD); dot(x,z,1.6,'#0b1a13'); });
-  [[-50,33.5],[46,-22.3]].forEach(([x,z]) => { dot(x,z,.6,GOLD); g.strokeStyle = GOLD; g.lineWidth = .15; g.beginPath(); g.arc(x,z,1.3,0,Math.PI*2); g.stroke(); });
   const S = '#e8efe9'; g.strokeStyle = S; g.fillStyle = S; g.lineWidth = .22;
-  g.setLineDash([1.4,.9]); g.strokeRect(-50,-20,38,50); g.setLineDash([]);
-  g.strokeRect(4.5,-8.75,51,25.5);
-  g.strokeRect(-48.6,-6.6,21.2,23.2);
-  ENS.forEach(([x,z]) => g.strokeRect(x-1.9, z-1.9, 3.8, 3.8));
+  g.setLineDash([1.4,.9]); g.strokeRect(-20,-60,40,76); g.setLineDash([]);
+  g.strokeRect(ESPX-12.75,ESPZ-25.5,25.5,51);
+  g.strokeRect(-10.6,-11.6,21.2,23.2);
+  g.strokeRect(11,-2,4,4);
   g.textBaseline = 'middle';
   const txt = (s, x, z, size, w, font) => { g.font = (w || 600) + ' ' + size + 'px ' + (font || FD); g.fillText(s, x, z); };
-  txt('GASKET LINE', -49, -18.4, 1.5, 500, FM);
-  txt('J1  BME690 8X SHUTTLE', -48.6, -8.2, 1.7);
-  ['U2','U3','U4','U5'].forEach((s,i) => txt(s, ENS[i][0]-1.9, ENS[i][1]-2.9, 1.5));
-  txt('U1  ESP32 DEVKIT', 14, 4, 2.2);
-  txt('U6 CHG', 43, -19.6, 1.5); txt('U7 3V3', 34, -19.6, 1.5); txt('J2 BATT', 7, -19.6, 1.5); txt('J3 FAN', -9, -14.4, 1.5);
-  txt('SW1', 35.7, 31.3, 1.5); txt('D1', 49.4, 31.3, 1.4);
-  txt('SNIFF HUB', -8, 29.6, 4.2, 700);
-  txt('REV A · SDP27 · UMASS ECE', -8, 33.6, 1.7, 500, FM);
+  txt('GASKET LINE', -19, 14.2, 1.5, 500, FM);
+  txt('J1 BME690 8X', -10.6, -13, 1.7);
+  txt('U8 ENS160 DNP', 7.5, 3.4, 1.3);
+  txt('U1 ESP32 DEVKIT', ESPX-9, ESPZ-27, 2);
+  txt('J10', -47, -28, 1.7); txt('J11', -47, -50, 1.7); txt('J12', 36.5, 10, 1.7); txt('J13', 46.5, 10, 1.7);
+  txt('U3 ADS1115', 29, 22, 1.7);
+  txt('U6 5V HEATER BOOST', -44, 37.6, 1.5); txt('U7 CHG+PROT', -58, 28.4, 1.5);
+  txt('U4 3V3 SENSOR', 19, 37.4, 1.5); txt('Q1 PUMP', 24, -28, 1.5); txt('D1', 19.5, -11.4, 1.5); txt('Q2 SERVO', 15.5, 27, 1.5);
+  txt('D2', 33, 50, 1.5);
+  txt('SNIFF HUB', -56, 46.5, 4.2, 700);
+  txt('REV B · SDP27 · UMASS ECE', -56, 51, 1.7, 500, FM);
 }
 function drawShuttle(g){
   g.translate(10, 11);
@@ -276,11 +398,9 @@ function drawShuttle(g){
   const ringAt = (x,z) => { g.fillStyle = '#d2ad55'; g.beginPath(); g.arc(x,z,.5,0,Math.PI*2); g.fill(); g.fillStyle = '#10301c'; g.beginPath(); g.arc(x,z,.25,0,Math.PI*2); g.fill(); };
   for (let i = 0; i < 7; i++) ringAt((i-3)*1.27, -8.89);
   for (let i = 0; i < 9; i++) ringAt((i-4)*1.27, 8.89);
-  g.fillStyle = '#d2ad55'; [[-9,-7.3],[9,-7.3],[-9,7.3],[9,7.3]].forEach(([x,z]) => g.fillRect(x-.4,z-.4,.8,.8));
   g.strokeStyle = '#eef3ee'; g.fillStyle = '#eef3ee'; g.lineWidth = .1; g.textBaseline = 'middle';
   g.font = '600 .8px ' + FD;
   SENS.forEach(([x,z],i) => { g.strokeRect(x-1.9, z-1.9, 3.8, 3.8); g.fillText('U'+(i+1), x+2.05, z-1.2); });
-  g.strokeRect(-7.9, 4.2, 3.8, 3.2);
   g.font = '600 1.05px ' + FD; g.fillText('BME690 8xShuttle board', -9.4, -10.25);
   g.font = '500 .8px ' + FM; g.fillText('BST01761_V1.3', -9.4, 10.3);
 }
@@ -291,7 +411,6 @@ function drawModule(g){
   g.beginPath(); g.moveTo(-7.4,-7.6);
   for (let i = 0; i < 6; i++){ const z = -7.6 + i*2.5; g.lineTo(-11.8, z); g.lineTo(-11.8, z+1.25); g.lineTo(-7.8, z+1.25); g.lineTo(-7.8, z+2.5); }
   g.stroke();
-  g.strokeStyle = '#d9ded9'; g.lineWidth = .12; g.strokeRect(-12.5,-8.7,5.9,17.4);
 }
 function drawCan(g){
   g.translate(8.8, 7.8);
@@ -299,41 +418,43 @@ function drawCan(g){
   g.fillStyle = '#7d8489'; g.textBaseline = 'middle';
   g.font = '600 1.9px ' + FD; g.fillText('ESP32-WROOM-32D', -7.2, -3);
   g.font = '500 1.05px ' + FM; g.fillText('WI-FI + BT · 4 MB FLASH', -7.2, -.6);
-  g.strokeStyle = '#8e959a'; g.lineWidth = .15; g.strokeRect(-7.2, 1.6, 4.4, 4.4);
 }
 function drawBatt(g){
-  g.save(); rrPath(g, 0, 0, 30, 18, 1.4); g.clip();
-  g.fillStyle = '#eef1ec'; g.fillRect(0,0,30,18);
-  g.fillStyle = '#d59a2c'; g.fillRect(0,14.8,30,3.2);
+  g.fillStyle = '#21507a'; g.fillRect(0,0,58,70);
+  g.fillStyle = '#d59a2c'; g.fillRect(0,0,58,3);
+  g.fillStyle = '#e8eef2'; g.textBaseline = 'middle';
+  g.save(); g.translate(29,35); g.rotate(Math.PI/2);
+  g.font = '600 9px ' + FD; g.fillText('18650', -30, -3);
+  g.font = '500 3.4px ' + FM; g.fillText('3.6 V · 3400 mAh', -30, 5);
   g.restore();
-  g.fillStyle = '#24302b'; g.textBaseline = 'middle';
-  g.font = '600 4.4px ' + FD; g.fillText('LiPo 1S', 2, 4.6);
-  g.font = '500 2px ' + FM; g.fillText('3.7 V · 1000 mAh', 2, 9);
-  g.font = '500 1.5px ' + FM; g.fillText('PLACEHOLDER CELL', 2, 11.9);
-}
-function drawMesh(g){
-  g.strokeStyle = 'rgba(110,140,150,.8)'; g.lineWidth = .1;
-  for (let x = 0; x <= 18; x += .7){ g.beginPath(); g.moveTo(x,0); g.lineTo(x,9); g.stroke(); }
-  for (let y = 0; y <= 9; y += .7){ g.beginPath(); g.moveTo(0,y); g.lineTo(18,y); g.stroke(); }
-  g.lineWidth = .4; g.strokeRect(.2,.2,17.6,8.6);
 }
 function drawLid(g){
   g.fillStyle = '#7a8882'; g.textBaseline = 'middle';
   g.font = '700 10px ' + FD; g.fillText('SNIFF', 0, 5.6);
   g.font = '500 1.9px ' + FM; g.fillText('SDP27 · ARTIFICIAL OLFACTORY SENSING', .3, 11.6);
 }
+const drawFig = name => g => {
+  g.fillStyle = '#16181b'; g.fillRect(0,0,28,10);
+  g.fillStyle = '#d8dddb'; g.textBaseline = 'middle';
+  g.font = '600 3.4px ' + FD; g.fillText(name, 1, 3.3);
+  g.font = '500 1.6px ' + FM; g.fillText('MODULE · CAN DOWN', 1, 7.4);
+};
+function drawCarbon(g){
+  g.fillStyle = '#1b1c1c'; g.fillRect(0,0,44,26);
+  for (let i = 0; i < 520; i++){ const s = 25 + (i*37)%50; g.fillStyle = 'rgb('+s+','+s+','+(s+2)+')'; const x = (i*7.13)%44, y = (i*3.71)%26; g.beginPath(); g.arc(x,y,.5+.45*((i*13)%5)/4,0,6.3); g.fill(); }
+}
 
 /* ---------- 3D scene ---------- */
 function build3D(){
   const stage = $('stage');
-  const renderer = new THREE.WebGLRenderer({antialias:true});
+  const renderer = new THREE.WebGLRenderer({antialias:true, preserveDrawingBuffer:true});
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   stage.insertBefore(renderer.domElement, stage.firstChild);
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(30, 1, 1, 4000);
+  const camera = new THREE.PerspectiveCamera(30, 1, 1, 5000);
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true; controls.dampingFactor = .08;
-  controls.minDistance = 90; controls.maxDistance = 800; controls.autoRotateSpeed = 1.4;
+  controls.minDistance = 120; controls.maxDistance = 1400; controls.autoRotateSpeed = 1.4;
 
   scene.add(new THREE.HemisphereLight(0xffffff, 0x8d9792, .72));
   const key = new THREE.DirectionalLight(0xffffff, .75); key.position.set(140, 260, 180); scene.add(key);
@@ -349,191 +470,342 @@ function build3D(){
     redraw(); redraws.push(redraw); return t;
   }
   const M = (color, o) => new THREE.MeshStandardMaterial(Object.assign({color:color, roughness:.6, metalness:.05}, o || {}));
-  const clearM = () => new THREE.MeshStandardMaterial({color:0xbfe3ee, roughness:.12, metalness:0, transparent:true, opacity:.2, depthWrite:false, side:THREE.DoubleSide});
+  const clearM = (op, col) => new THREE.MeshStandardMaterial({color:col || 0xbfe3ee, roughness:.12, metalness:0, transparent:true, opacity:op || .22, depthWrite:false, side:THREE.DoubleSide});
   function add(parent, geo, mat, x, y, z){ const m = new THREE.Mesh(geo, mat); m.position.set(x||0, y||0, z||0); parent.add(m); return m; }
   const B = (parent, w, h, d, mat, x, y0, z) => add(parent, new THREE.BoxGeometry(w,h,d), mat, x, y0 + h/2, z);
   function rr(w, d, r){ const s = new THREE.Shape(); const x = -w/2, y = -d/2; s.moveTo(x+r,y); s.lineTo(x+w-r,y); s.quadraticCurveTo(x+w,y,x+w,y+r); s.lineTo(x+w,y+d-r); s.quadraticCurveTo(x+w,y+d,x+w-r,y+d); s.lineTo(x+r,y+d); s.quadraticCurveTo(x,y+d,x,y+d-r); s.lineTo(x,y+r); s.quadraticCurveTo(x,y,x+r,y); return s; }
-  function slab(parent, w, d, h, r, mat, x, y0, z, holes){ const s = rr(w,d,r); if (holes) holes.forEach(hh => s.holes.push(hh)); const g = new THREE.ExtrudeGeometry(s, {depth:h, bevelEnabled:false, curveSegments:8}); g.rotateX(-Math.PI/2); return add(parent, g, mat, x, y0, z); }
+  const circ = (x, y, r) => { const p = new THREE.Path(); p.absarc(x, y, r, 0, Math.PI*2, true); return p; };
+  function slab(parent, w, d, h, r, mat, x, y0, z, holes){ const s = rr(w,d,r); if (holes) holes.forEach(hh => s.holes.push(hh)); const g = new THREE.ExtrudeGeometry(s, {depth:h, bevelEnabled:false, curveSegments:12}); g.rotateX(-Math.PI/2); return add(parent, g, mat, x, y0, z); }
   const ring = (parent, w, d, r, t, h, mat, x, y0, z) => slab(parent, w, d, h, r, mat, x, y0, z, [rr(w-2*t, d-2*t, Math.max(r-t, .6))]);
+  /* ring with a gap in the front wall (+z side) */
+  function cRing(parent, w, d, r, t, gap, h, mat, y0){
+    const s = new THREE.Shape(), a = w/2, b = d/2, q = r - t, c = a - t, e = b - t;
+    s.moveTo(gap/2,-b); s.lineTo(a-r,-b); s.quadraticCurveTo(a,-b,a,-b+r); s.lineTo(a,b-r); s.quadraticCurveTo(a,b,a-r,b); s.lineTo(-a+r,b); s.quadraticCurveTo(-a,b,-a,b-r); s.lineTo(-a,-b+r); s.quadraticCurveTo(-a,-b,-a+r,-b); s.lineTo(-gap/2,-b);
+    s.lineTo(-gap/2,-e); s.lineTo(-c+q,-e); s.quadraticCurveTo(-c,-e,-c,-e+q); s.lineTo(-c,e-q); s.quadraticCurveTo(-c,e,-c+q,e); s.lineTo(c-q,e); s.quadraticCurveTo(c,e,c,e-q); s.lineTo(c,-e+q); s.quadraticCurveTo(c,-e,c-q,-e); s.lineTo(gap/2,-e); s.closePath();
+    const g = new THREE.ExtrudeGeometry(s, {depth:h, bevelEnabled:false, curveSegments:8}); g.rotateX(-Math.PI/2); return add(parent, g, mat, 0, y0, 0);
+  }
   const cyl = (parent, r, h, mat, x, y0, z, seg) => add(parent, new THREE.CylinderGeometry(r, r, h, seg || 24), mat, x, y0 + h/2, z);
-  function edges(parent, w, h, d, mat, x, y0, z){ const l = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(w,h,d)), mat); l.position.set(x, y0 + h/2, z); parent.add(l); return l; }
+  /* cylinders along z (z0 to z1) and along x */
+  const zc = (parent, r, z0, z1, mat, x, y, seg, open) => { const g = new THREE.CylinderGeometry(r, r, Math.abs(z1-z0), seg || 28, 1, !!open); g.rotateX(Math.PI/2); return add(parent, g, mat, x, y, (z0+z1)/2); };
+  const xc = (parent, r, x0, x1, mat, y, z, seg) => { const g = new THREE.CylinderGeometry(r, r, Math.abs(x1-x0), seg || 28); g.rotateZ(Math.PI/2); return add(parent, g, mat, (x0+x1)/2, y, z); };
   function decal(parent, w, d, tex, x, y, z){ const m = new THREE.MeshStandardMaterial({map:tex, transparent:true, roughness:.7, metalness:0, depthWrite:false, polygonOffset:true, polygonOffsetFactor:-2}); const p = add(parent, new THREE.PlaneGeometry(w,d), m, x, y, z); p.rotation.x = -Math.PI/2; return p; }
 
   PARTS.forEach(p => { const g = new THREE.Group(); g.userData.part = p.id; scene.add(g); p.group = g; p.offV = new THREE.Vector3().fromArray(p.off); p.ancV = new THREE.Vector3().fromArray(p.anc); });
   const G = id => byId[id].group;
+  const brass = M(0xb89a52, {metalness:.7, roughness:.38});
 
-  /* 9 Bottom tray */
-  (function(){ const g = G('tray'); const petg = M(0xd3d9d6, {roughness:.78}); const dark = M(0x111514, {roughness:.9}); const brass = M(0xb89a52, {metalness:.7, roughness:.38}); const rub = M(0x2a2d2c, {roughness:.95});
-    slab(g, 120, 80, 2.5, 9, petg, 0, 0, 0);
-    ring(g, 120, 80, 9, 2.5, 27, petg, 0, 0, 0);
-    for (let i = 0; i < 5; i++) B(g, 18, 1.8, .8, dark, -31, 7.5 + i*4, -39.9);
-    B(g, 8.6, 3.6, .8, dark, 40, 14.8, 39.9);
-    HOLES.forEach(([x,z]) => cyl(g, 2.6, 10.5, brass, x, 2.5, z));
-    [[-48,-30],[48,-30],[-48,30],[48,30]].forEach(([x,z]) => cyl(g, 4, 1.2, rub, x, -1.2, z));
+  /* 2 Bottom tray */
+  (function(){ const g = G('tray'); const petg = M(0xd3d9d6, {roughness:.78}); const dark = M(0x111514, {roughness:.9}); const rub = M(0x2a2d2c, {roughness:.95});
+    slab(g, 136, 130, 2.5, 10, petg, 0, 0, 0);
+    ring(g, 136, 130, 10, 2.5, 24, petg, 0, 0, 0);
+    cRing(g, 136, 130, 10, 2.5, 68, 12, petg, 24);
+    for (let i = 0; i < 5; i++) B(g, 20, 1.6, .8, dark, 55, 11 + i*3.4, -64.9);
+    B(g, 9.4, 2.4, .8, dark, -67.9, 33.6, 30).rotation.y = Math.PI/2;
+    B(g, 7, 2.4, .8, dark, -67.9, 33.6, 48).rotation.y = Math.PI/2;
+    HOLES.forEach(([x,z]) => cyl(g, 2.6, 29.5, brass.clone(), x, 2.5, z));
+    [[-54,-52],[54,-52],[-54,52],[54,52]].forEach(([x,z]) => cyl(g, 4, 1.2, rub, x, -1.2, z));
   })();
 
   /* 1 Top shell */
   (function(){ const g = G('lid'); const ch = M(0x2f3734, {roughness:.62}); const dark = M(0x0e1211, {roughness:.9});
-    ring(g, 120, 80, 9, 2.5, 14.5, ch, 0, 27, 0);
-    slab(g, 120, 80, 2.5, 9, ch, 0, 41.5, 0);
-    B(g, .8, 3.6, 9.6, dark, 59.9, 27, 4);
+    cRing(g, 136, 130, 10, 2.5, 68, 20, ch, 36);
+    ring(g, 136, 130, 10, 2.5, 4.5, ch, 0, 56, 0);
+    slab(g, 136, 130, 2.5, 10, ch, 0, 60.5, 0);
+    B(g, 9.6, 3.6, .8, dark, ESPX, 45.8, -64.9);
     const pipe = M(0xcdeedb, {emissive:0x3dbb78, emissiveIntensity:.55, roughness:.2, transparent:true, opacity:.85});
-    cyl(g, 1.4, 29.4, pipe, 48, 15.3, 31, 16);
-    decal(g, 46, 13, canvasTex(46, 13, 12, drawLid), -6, 44.06, 6);
+    cyl(g, 1.4, 28.8, pipe, 30, 34.4, 50, 16);
+    decal(g, 46, 13, canvasTex(46, 13, 12, drawLid), -30, 63.06, 40);
   })();
 
-  /* 10 Nose intake */
-  let noseGlow = [];
-  (function(){ const g = G('nose'); const cx = -31, z0 = 39.4;
-    /* rows top to bottom: y, tip half-width, tip depth, wing depth, wing centre, wing half-width */
-    const R = [[26.6,3.8,0,0,7,4],[26.3,4.2,1.6,0,7,4],[24,4.6,3.6,0,7,4],[20,5.2,6.6,0,7,4],[16,6,9.6,0,7,4],[12.6,7,12.4,2.6,7,5],
-      [10.2,7.8,14.4,6.4,8.4,6],[8,7.8,15,8.4,9,6.4],[6.2,7.4,14.8,8.8,9,6.5],[4.6,6.8,13.6,8.4,8.8,6.3],[3.6,5.8,10,6.4,8.4,5.8],[3,4.4,5,3.2,8,5],[2.8,3.6,0,0,8,5]];
-    const cr = (p0,p1,p2,p3,t) => { const t2 = t*t, t3 = t2*t; return .5*((2*p1) + (-p0+p2)*t + (2*p0-5*p1+4*p2-p3)*t2 + (-p0+3*p1-3*p2+p3)*t3); };
-    const rows = [];
-    for (let i = 0; i < R.length - 1; i++) for (let k = 0; k < 8; k++){ const t = k/8, A = R[Math.max(i-1,0)], B0 = R[i], C = R[i+1], Dd = R[Math.min(i+2,R.length-1)];
-      rows.push(B0.map((_, j) => Math.max(j === 0 ? -1e9 : 0, cr(A[j], B0[j], C[j], Dd[j], t)))); }
-    rows.push(R[R.length-1].slice());
-    const NX = 180, posA = [], idx = [];
-    const sm = (a, b) => Math.pow(Math.pow(a, 4) + Math.pow(b, 4), .25);
-    const W = 15.5; rows.forEach(([y, wt, dt, da, xa, wa]) => {
-      for (let j = 0; j <= NX; j++){ const x = -W + 2*W*j/NX; const ax = Math.abs(x);
-        const tip = dt * Math.sqrt(Math.max(0, 1 - (x/wt)*(x/wt))); const wing = da * Math.sqrt(Math.max(0, 1 - ((ax-xa)/wa)*((ax-xa)/wa)));
-        posA.push(cx + x, y, z0 + sm(tip, wing)); } });
-    for (let i = 0; i < rows.length - 1; i++) for (let j = 0; j < NX; j++){ const a = i*(NX+1)+j, b = a + NX + 1; idx.push(a, a+1, b, b, a+1, b+1); }
-    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(posA, 3)); geo.setIndex(idx); geo.computeVertexNormals();
-    const skin = M(0x2f3734, {roughness:.48, side:THREE.DoubleSide});
-    const body = add(g, geo, skin); body.updateMatrixWorld();
-    const c = document.createElement('canvas'); c.width = 160; c.height = 100; const x = c.getContext('2d');
-    const gr = x.createRadialGradient(80, 50, 0, 80, 50, 50);
-    gr.addColorStop(0, 'rgba(3,8,6,1)'); gr.addColorStop(.55, 'rgba(8,24,15,1)'); gr.addColorStop(.8, 'rgba(70,220,140,1)'); gr.addColorStop(1, 'rgba(70,220,140,0)');
-    x.setTransform(1, 0, 0, .62, 0, 19); x.fillStyle = gr; x.beginPath(); x.arc(80, 50, 50, 0, Math.PI*2); x.fill();
-    const tex = new THREE.CanvasTexture(c);
-    const ray = new THREE.Raycaster(); const nrm = new THREE.Vector3();
-    ray.set(new THREE.Vector3(cx + 3.7, -2.6, 80), new THREE.Vector3(0, .32, -1).normalize());
-    const hit = ray.intersectObject(body)[0];
-    if (hit){
-      nrm.copy(hit.face.normal).transformDirection(body.matrixWorld); if (nrm.z < 0) nrm.negate();
-      [-1, 1].forEach(sx => {
-        const mat = new THREE.MeshBasicMaterial({map:tex, transparent:true, depthWrite:false, polygonOffset:true, polygonOffsetFactor:-4});
-        const d = new THREE.Mesh(new THREE.PlaneGeometry(5.4, 5.4), mat); const n = nrm.clone(); n.x *= sx;
-        d.position.set(cx + sx * (hit.point.x - cx), hit.point.y, hit.point.z).addScaledVector(n, .08);
-        d.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), n); d.rotateZ(sx * .22); g.add(d); noseGlow.push(mat);
-      });
-    }
+  /* 3 Nose shroud: a sculpted height field trimmed around the nostril cones */
+  (function(){ const g = G('shroud'); const skin = M(0x2f3734, {roughness:.5, side:THREE.DoubleSide});
+    const yc = 40, bw = 68, bh = 32;
+    const s = rr(bw, bh, 5); [-NX, NX].forEach(sx => s.holes.push(circ(sx, AY - yc, 9.4)));
+    const pg = new THREE.ExtrudeGeometry(s, {depth:2.5, bevelEnabled:false, curveSegments:24}); add(g, pg, skin, 0, yc, 62.5);
+    const nx = 170, ny = 110, pos = [], idx = [], z0 = 65;
+    const sm = (a, b) => Math.pow(a*a*a*a + b*b*b*b, .25);
+    const H = (x, y) => { const u = x/34, v = (y-yc)/16; const w = Math.max(0, 1 - Math.pow(Math.abs(u),3.2) - Math.pow(Math.abs(v),3.2));
+      const ry = y > 45 ? (y-45)/10 : (45-y)/8; const ridge = 29*Math.exp(-(x/10)*(x/10))*Math.exp(-ry*ry);
+      const ax = (Math.abs(x)-NX)/17, ay = (y-AY)/14; const wing = 23*Math.exp(-ax*ax-ay*ay);
+      const d = Math.hypot(Math.abs(x)-NX, y-AY); const lim = 19.2 + Math.max(0, d-13)*1.6;
+      const h = sm(ridge, wing)*Math.min(1, w*2.6); return lim - sm(Math.max(0, lim-h), .6) + .0; };
+    for (let j = 0; j <= ny; j++) for (let i = 0; i <= nx; i++){ const x = -34 + 68*i/nx, y = 24 + 32*j/ny; pos.push(x, y, z0 + H(x,y)); }
+    for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++){ const a = j*(nx+1)+i, b = a+nx+1;
+      const cx = -34 + 68*(i+.5)/nx, cy = 24 + 32*(j+.5)/ny;
+      if (Math.hypot(Math.abs(cx)-NX, cy-AY) < 10.2) continue;
+      idx.push(a, a+1, b, b, a+1, b+1); }
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setIndex(idx); geo.computeVertexNormals();
+    add(g, geo, skin);
   })();
 
-  /* 7 Hub PCB */
-  (function(){ const g = G('hub');
-    const side = M(0x18452f, {roughness:.55}); const bottom = M(0x1b5038, {roughness:.55});
-    const top = new THREE.MeshStandardMaterial({map: canvasTex(112, 60, 10, drawHub), roughness:.5, metalness:.05});
-    add(g, new THREE.BoxGeometry(112, 1.6, 60), [side, side, top, bottom, side, side], 0, 13.8, 6);
-    const blk = M(0x1c1f21, {roughness:.5}); const wht = M(0xece8dc, {roughness:.6}); const sil = M(0xc4c8cb, {metalness:.75, roughness:.32}); const tan = M(0xb79b6a, {roughness:.6});
-    const led = M(0x9be8b9, {emissive:0x2fbf6e, emissiveIntensity:.8});
-    const y = 14.6;
-    B(g, 9.9, 3, 2.4, blk, -38, y, -3.89); B(g, 12.4, 3, 2.4, blk, -38, y, 13.89);
-    B(g, 38.6, 8.5, 2.5, blk, 29.8, y, -7.43); B(g, 38.6, 8.5, 2.5, blk, 29.8, y, 15.43);
-    B(g, 3, 1, 3, blk, 45, y, -16);
-    B(g, 6.5, 1.6, 3.5, blk, 37, y, -16);
-    B(g, 6, 4.5, 4.5, wht, 10, y, -16);
-    B(g, 6, 4.5, 4.5, wht, -6, y, -18);
-    B(g, 8.6, 3.5, 3.5, sil, 40, y, 34.5); B(g, 1.6, 1.6, 4, blk, 40.8, y + 1, 38.3);
-    B(g, 1.6, .8, .8, led, 48, y, 31);
-    [[41.5,-13.2],[42.8,-13.2],[33,-13],[49,-16.4],[49,-14.8]].forEach(([x,z]) => B(g, 1, .5, .5, tan, x, y, z));
-    HOLES.forEach(([x,z]) => cyl(g, 2.3, 1.3, sil, x, y, z, 20));
+  /* 4, 5 Nostrils: cone, barrel and filter stack. Sample is on the -x side. */
+  const glows = {};
+  function nostril(id, sx, fill){ const g = G(id);
+    const pts = [[7,66],[9.2,66],[9.2,68],[10.2,74],[12.2,84],[12.2,85.5],[11.2,85.5],[8.8,74],[7,68],[7,66]].map(a => new THREE.Vector2(a[0], a[1]));
+    const cg = new THREE.LatheGeometry(pts, 48); cg.rotateX(Math.PI/2);
+    add(g, cg, M(0x3a4340, {roughness:.42, side:THREE.DoubleSide}), sx, AY, 0);
+    zc(g, 9, 40, 66, clearM(.26, 0xdfe9e6), sx, AY, 36, true);
+    zc(g, 9.6, 58, 62.5, M(0x3a4340, {roughness:.5}), sx, AY, 36);
+    zc(g, 3, 36.5, 40, M(0x3a4340, {roughness:.5}), sx, AY);
+    const gm = new THREE.MeshBasicMaterial({color:0x46dc8c, transparent:true, opacity:.25, side:THREE.DoubleSide});
+    const rg = new THREE.RingGeometry(11.25, 12.2, 48); add(g, rg, gm, sx, AY, 85.6); glows[id] = gm;
+    fill(g, sx);
+  }
+  nostril('noseS', -NX, (g, sx) => {
+    const wht = M(0xf1efe8, {roughness:.85}); const st = M(0xaeb6ba, {metalness:.7, roughness:.35});
+    zc(g, 8.6, 56, 56.8, wht, sx, AY, 32);
+    zc(g, 8.6, 57.2, 57.8, st, sx, AY, 32);
+    zc(g, 8.7, 42, 44, M(0x4b5552, {roughness:.5}), sx, AY, 32);
+  });
+  nostril('noseR', NX, (g, sx) => {
+    const pad = M(0xe9eadf, {roughness:.95});
+    const ct = canvasTex(44, 26, 7, drawCarbon); ct.wrapS = ct.wrapT = THREE.RepeatWrapping;
+    zc(g, 8.6, 57, 60.5, pad, sx, AY, 32);
+    zc(g, 8.6, 43.5, 57, M(0x2a2b2b, {map:ct, roughness:.95}), sx, AY, 32);
+    zc(g, 8.6, 40.6, 43.5, pad, sx, AY, 32);
+  });
+
+  /* 6 Three-way stopcock */
+  let plug = null, horn = null;
+  (function(){ const g = G('valve'); const z = 28;
+    const body = M(0xe7edf0, {transparent:true, opacity:.78, roughness:.25});
+    cyl(g, 6, 11, body, 0, AY-5.5, z, 32);
+    xc(g, 3, -10, -5, body, AY, z); xc(g, 3, 5, 10, body, AY, z);
+    zc(g, 3, 19.2, 23, body, 0, AY, 24);
+    zc(g, 1.6, 22.8, 19, M(0xcfd8db, {roughness:.3}), 0, AY);
+    B(g, 8, 1, 8, M(0x4d5855, {roughness:.5}), 0, AY-7, z);
+    plug = new THREE.Group(); plug.position.set(0, AY+5.6, z); g.add(plug);
+    cyl(plug, 5, .8, M(0x2e6fb3, {roughness:.4}), 0, 0, 0, 32);
+    const w = M(0xf4f6f5, {roughness:.4, emissive:0x333333});
+    B(plug, 8, .3, 1.6, w, 0, .8, 0); B(plug, 1.6, .3, 4, w, 0, .8, 2);
   })();
 
-  /* 5 ENS160 array */
-  (function(){ const g = G('ens'); const lidM = M(0xc9ccce, {metalness:.55, roughness:.35}); const dk = M(0x151817); const tan = M(0xb79b6a, {roughness:.6});
-    ENS.forEach(([x,z]) => { B(g,3,.9,3,lidM,x,14.6,z); B(g,.8,.06,.8,dk,x,15.5,z); B(g,.5,.5,1,tan,x-.8,14.6,z+2.4); B(g,.5,.5,1,tan,x+.8,14.6,z+2.4); });
+  /* 7 Servo */
+  (function(){ const g = G('servo'); const z = 28; const blk = M(0x24272a, {roughness:.5}); const met = M(0xb6bcbf, {metalness:.8, roughness:.3});
+    const cz = z + 5.9; /* shaft sits toward one end of the body */
+    B(g, 12.2, 22.7, 22.8, blk, 0, 4.3, cz);
+    B(g, 12.2, 2.5, 32.2, blk, 0, 20.2, cz);
+    cyl(g, 6, 2, blk, 0, 27, z, 24);
+    cyl(g, 2.4, 3, met, 0, 29, z, 16);
+    [cz-14, cz+14].forEach(zz => cyl(g, 1.1, 2.7, brass.clone(), 0, 20.1, zz, 10));
+    B(g, 20, 3, 8, M(0x777f7c, {roughness:.7}), 0, 1.5, cz); /* base foot */
+    B(g, 20, 3, 8, M(0x777f7c, {roughness:.7}), 0, 1.5, cz-12);
+    horn = new THREE.Group(); horn.position.set(0, 29.6, z); g.add(horn);
+    cyl(horn, 4, 3.4, M(0xeee9dc, {roughness:.6}), 0, 0, 0, 24);
+    B(horn, 3, 1.2, 14, M(0xeee9dc, {roughness:.6}), 0, .4, 4);
+    cyl(horn, 3.4, 3, M(0xd9d3c4, {roughness:.6}), 0, 3.4, 0, 3);
   })();
 
-  /* 4 BME690 shuttle */
-  (function(){ const g = G('bme'); const cx = -38, cz = 5, yb = 19.5;
+  /* 8 Sensor chamber */
+  (function(){ const g = G('chamber'); const cz = -22;
+    const body = M(0xb9c0c2, {metalness:.45, roughness:.42}); const gas = M(0x1b1d1c, {roughness:.95}); const seal = M(0x2b2d2c, {roughness:.8});
+    ring(g, 40, 76, 3, 3, 1, gas, 0, HT, cz);
+    ring(g, 40, 76, 3, 3, 9, body, 0, HT+1, cz);
+    const holes = []; FIG.zs.forEach(z => [-FIG.x, FIG.x].forEach(x => holes.push(circ(x, -(z-cz), FIG.canD/2 + .25))));
+    slab(g, 40, 76, 3, 3, body, 0, HT+10, cz, holes);
+    FIG.zs.forEach(z => [-FIG.x, FIG.x].forEach(x => { const t = new THREE.TorusGeometry(FIG.flD/2, .7, 10, 30); t.rotateX(Math.PI/2); add(g, t, seal, x, HT+13.1, z); }));
+    zc(g, 3, 16, 18.8, body, 0, AY);
+    [[-17.5,13],[17.5,13],[-17.5,-57],[17.5,-57]].forEach(([x,z]) => cyl(g, 1.3, 1, M(0x60686a, {metalness:.7, roughness:.35}), x, HT+13, z, 10));
+  })();
+
+  /* 9 BME690 shuttle */
+  (function(){ const g = G('bme'); const cx = 0, cz = 0, yb = HT + 4.9;
     const side = M(0x1f5a32); const top = new THREE.MeshStandardMaterial({map: canvasTex(20, 22, 24, drawShuttle), roughness:.5});
     add(g, new THREE.BoxGeometry(20, 1.7, 22), [side, side, top, side, side, side], cx, yb + .85, cz);
     const lidM = M(0xbfc4c7, {metalness:.6, roughness:.32}); const dk = M(0x141716); const gold = M(0xd1ac55, {metalness:.85, roughness:.3}); const blk = M(0x1c1f21);
     SENS.forEach(([sx,sz]) => { B(g,3,.93,3,lidM,cx+sx,yb+1.7,cz+sz); B(g,.6,.05,.6,dk,cx+sx+.7,yb+2.63,cz+sz-.7); });
-    B(g, 2.9, 1.1, 1.3, blk, cx-6, yb+1.7, cz+5.8);
     B(g, 9.9, 1.2, 2.4, blk, cx, yb-1.2, cz-8.89); B(g, 12.4, 1.2, 2.4, blk, cx, yb-1.2, cz+8.89);
     for (let i = 0; i < 7; i++) B(g, .4, 5, .4, gold, cx+(i-3)*1.27, yb-5, cz-8.89);
     for (let i = 0; i < 9; i++) B(g, .4, 5, .4, gold, cx+(i-4)*1.27, yb-5, cz+8.89);
   })();
 
-  /* 6 ESP32 devkit */
-  (function(){ const g = G('esp'); const yb = 25.6, cz = 4;
+  /* 10 Figaro modules: board face down, can through the chamber lid */
+  (function(){ const g = G('fig');
+    const pcb = M(0x16181b, {roughness:.55}); const canM = M(0xc4c8c4, {metalness:.72, roughness:.34}); const dk = M(0x0d0f10, {roughness:.8});
+    const blue = M(0x2b53b8, {roughness:.5}); const blk = M(0x1b1d1f, {roughness:.55}); const pin = M(0xc9cdcf, {metalness:.8, roughness:.3}); const ic = M(0x252728);
+    const flangeY = HT + 13, faceY = flangeY + .6 + FIG.legs;
+    let n = 0;
+    FIG.zs.forEach(z => [-1, 1].forEach(s => {
+      const canX = s*FIG.x, inner = canX - s*FIG.endOff, mid = inner + s*FIG.L/2, outer = inner + s*FIG.L;
+      B(g, FIG.L, FIG.T, FIG.W, pcb, mid, faceY, z);
+      cyl(g, FIG.flD/2, .6, canM, canX, flangeY, z, 36);
+      cyl(g, FIG.canD/2, FIG.canH - .6, canM, canX, flangeY - FIG.canH + .6, z, 36);
+      cyl(g, 1.6, .05, dk, canX, flangeY - FIG.canH + .55, z, 20);
+      for (let a = 0; a < 4; a++) cyl(g, .28, FIG.legs + FIG.T + .6, pin, canX + 2.55*Math.cos(a*1.57+.78), flangeY + .6, z + 2.55*Math.sin(a*1.57+.78), 8);
+      B(g, 7, 6.6, 7, blue, inner + s*19, faceY - 6.6, z);
+      B(g, 5, 1.6, 4, ic, inner + s*13, faceY - 1.6, z + 6);
+      B(g, 2.4, 2.4, 10.2, blk, outer - s*1.4, faceY - 2.4, z);
+      for (let i = 0; i < 4; i++) B(g, 9, .6, .6, pin, outer + s*4.2, faceY - 1.6, z + (i-1.5)*2.54);
+      B(g, 13, 2.6, 10.2, blk, outer + s*8.6, faceY - 2.6, z);
+      [[inner + s*3,z-7.5,flangeY,faceY],[inner + s*3,z+7.5,flangeY,faceY],[outer - s*3,z-7.5,HT,faceY],[outer - s*3,z+7.5,HT,faceY]].forEach(([x,zz,a,b]) => cyl(g, 1.7, b-a, brass.clone(), x, a, zz, 12));
+      const d = decal(g, 15, 5.4, canvasTex(28, 10, 8, drawFig(FIG.names[n++])), inner + s*21, faceY + FIG.T + .05, z);
+      d.rotation.z = -Math.PI/2;
+    }));
+  })();
+
+  /* 11 Hub PCB */
+  (function(){ const g = G('hub');
+    const s = new THREE.Shape(), a = 64, b = 61, r = 6, nw = 26, nz = 37;
+    s.moveTo(nw, -b); s.lineTo(a-r, -b); s.quadraticCurveTo(a,-b,a,-b+r); s.lineTo(a,b-r); s.quadraticCurveTo(a,b,a-r,b); s.lineTo(-a+r,b); s.quadraticCurveTo(-a,b,-a,b-r); s.lineTo(-a,-b+r); s.quadraticCurveTo(-a,-b,-a+r,-b); s.lineTo(-nw,-b); s.lineTo(-nw,-nz); s.lineTo(nw,-nz); s.closePath();
+    s.holes.push(circ(0, -28, 7)); s.holes.push(circ(0, 52, 3));
+    const eg = new THREE.ExtrudeGeometry(s, {depth:1.6, bevelEnabled:false, curveSegments:16}); eg.rotateX(-Math.PI/2);
+    const t = canvasTex(128, 122, 9, drawHub); t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping; t.repeat.set(1/128, 1/122); t.offset.set(.5, .5);
+    add(g, eg, [new THREE.MeshStandardMaterial({map:t, roughness:.5, metalness:.05}), M(0x18452f, {roughness:.55})], 0, 32, 0);
+    const blk = M(0x1c1f21, {roughness:.5}); const wht = M(0xece8dc, {roughness:.6}); const sil = M(0xc4c8cb, {metalness:.75, roughness:.32}); const fer = M(0x4a4d50, {roughness:.5}); const tan = M(0xb79b6a, {roughness:.6});
+    const led = M(0x9be8b9, {emissive:0x2fbf6e, emissiveIntensity:.8});
+    const y = HT;
+    B(g, 9.9, 3, 2.4, blk, 0, y, -8.89); B(g, 12.4, 3, 2.4, blk, 0, y, 8.89);
+    B(g, 2.5, 8.5, 38.6, blk, ESPX-11.43, y, ESPZ); B(g, 2.5, 8.5, 38.6, blk, ESPX+11.43, y, ESPZ);
+    [[-42,-24],[-42,-46]].forEach(([x,z]) => B(g, 6, 7, 10, wht, x, y, z));
+    [[40,5],[50,5]].forEach(([x,z]) => B(g, 8, 7, 6, wht, x, y, z));
+    B(g, 4, 1.2, 3.2, blk, 34, y, 27);          /* ADS1115 */
+    B(g, 8, 4, 8, fer, -34, y, 44);             /* boost inductor */
+    B(g, 4, 1, 4, blk, -50, y, 34);             /* charger */
+    B(g, 8, 3.2, 9, sil, -60, y, 30);           /* USB-C */
+    B(g, 7.4, 3.2, 3.4, sil, -62, y, 48);       /* switch */
+    B(g, 3.5, 1.6, 2.5, blk, 24, y, 40);        /* LDO */
+    B(g, 3.5, 1.2, 3, blk, 28, y, -24);         /* Q1 */
+    B(g, 2.8, 1, 1.5, blk, 22, y, -14);         /* D1 */
+    B(g, 2.8, 1, 1.5, blk, 20, y, 30);          /* Q2 */
+    cyl(g, 4, 7, sil, -22, y, 30, 20);          /* bulk cap */
+    B(g, 1.6, .8, .8, led, 30, y, 50);
+    [[30,27],[32,29],[38,31],[36,24]].forEach(([x,z]) => B(g, 1, .5, .5, tan, x, y, z));
+    /* underside connectors */
+    [[44,-8,8],[8,-26,8],[20,30,10]].forEach(([x,z,w]) => B(g, w, 4.2, 5, wht, x, 27.8, z));
+    HOLES.forEach(([x,z]) => cyl(g, 2.3, 1.3, sil, x, y, z, 20));
+  })();
+
+  /* 12 ESP32 devkit, laid along z with USB to the rear */
+  (function(){ const root = G('esp'); const g = new THREE.Group(); g.position.set(ESPX, 0, ESPZ); g.rotation.y = Math.PI/2; root.add(g);
+    const yb = HT + 11; const cz = 0, ox = -30;
     const brd = M(0x15181a, {roughness:.5}); const blk = M(0x1c1f21); const sil = M(0xc4c8cb, {metalness:.75, roughness:.3}); const red = M(0xff8a7a, {emissive:0xd8352a, emissiveIntensity:.6});
-    B(g, 38.6, 2.5, 2.5, blk, 29.8, yb-2.5, cz-11.43); B(g, 38.6, 2.5, 2.5, blk, 29.8, yb-2.5, cz+11.43);
-    B(g, 51, 1.6, 25.5, brd, 30, yb, cz);
+    B(g, 38.6, 2.5, 2.5, blk, 0, yb-2.5, cz-11.43); B(g, 38.6, 2.5, 2.5, blk, 0, yb-2.5, cz+11.43);
+    B(g, 51, 1.6, 25.5, brd, 0, yb, cz);
     const mtop = new THREE.MeshStandardMaterial({map: canvasTex(25.5, 18, 20, drawModule), roughness:.5}); const mside = M(0x1d2124);
-    add(g, new THREE.BoxGeometry(25.5, .8, 18), [mside, mside, mtop, mside, mside, mside], 17.25, yb + 1.6 + .4, cz);
+    add(g, new THREE.BoxGeometry(25.5, .8, 18), [mside, mside, mtop, mside, mside, mside], 17.25+ox, yb + 2, cz);
     const ctop = new THREE.MeshStandardMaterial({map: canvasTex(17.6, 15.6, 20, drawCan), metalness:.7, roughness:.33}); const cside = M(0xc2c6c9, {metalness:.75, roughness:.3});
-    add(g, new THREE.BoxGeometry(17.6, 2.3, 15.6), [cside, cside, ctop, cside, cside, cside], 20.8, yb + 2.4 + 1.15, cz);
-    B(g, 5.8, 2.6, 7.6, sil, 54.4, yb+1.6, cz);
-    B(g, 3.5, 1.5, 3, blk, 50, yb+1.6, cz-8); B(g, 3.5, 1.5, 3, blk, 50, yb+1.6, cz+8);
-    B(g, 5, .9, 5, blk, 42, yb+1.6, cz);
-    B(g, 6.5, 1.6, 3.5, blk, 35, yb+1.6, cz-7);
-    B(g, 1.6, .8, .8, red, 47.5, yb+1.6, cz+4);
+    add(g, new THREE.BoxGeometry(17.6, 2.3, 15.6), [cside, cside, ctop, cside, cside, cside], 20.8+ox, yb + 3.55, cz);
+    B(g, 5.8, 2.6, 7.6, sil, 24.4, yb+1.6, cz);
+    B(g, 3.5, 1.5, 3, blk, 20, yb+1.6, cz-8); B(g, 3.5, 1.5, 3, blk, 20, yb+1.6, cz+8);
+    B(g, 5, .9, 5, blk, 12, yb+1.6, cz);
+    B(g, 1.6, .8, .8, red, 17.5, yb+1.6, cz+4);
   })();
 
-  /* 8 LiPo cell */
-  (function(){ const g = G('batt'); const pouch = M(0xa9b8c4, {metalness:.45, roughness:.42}); const kap = M(0xd59a2c, {roughness:.5}); const pcm = M(0x203f75);
-    slab(g, 50, 34, 7, 2.5, pouch, 28, 3, 6);
-    B(g, 3, 4, 30, kap, 54.4, 4.5, 6);
-    B(g, 2.4, 1, 14, pcm, 54.4, 8.5, 6);
-    decal(g, 30, 18, canvasTex(30, 18, 14, drawBatt), 26, 10.06, 6);
+  /* 13 18650 cell */
+  (function(){ const g = G('batt'); const z = -11, y = 14;
+    const hold = M(0x202325, {roughness:.65}); const met = M(0xc4c8cb, {metalness:.75, roughness:.3});
+    B(g, 77, 3, 21, hold, 0, 3, z); B(g, 2.4, 19, 21, hold, -37.3, 3, z); B(g, 2.4, 19, 21, hold, 37.3, 3, z);
+    B(g, 77, 8, 2, hold, 0, 3, z-10); B(g, 77, 8, 2, hold, 0, 3, z+10);
+    const c = new THREE.CylinderGeometry(9.3, 9.3, 69, 36); c.rotateZ(Math.PI/2);
+    const t = canvasTex(58, 70, 6, drawBatt);
+    const m = M(0xffffff, {map:t, roughness:.4}); const end = M(0x8f979b, {metalness:.7, roughness:.35});
+    add(g, c, [m, end, end], 0, y, z);
+    xc(g, 3, 34.5, 36.1, met, y, z, 18);
   })();
 
-  /* 3 Exhaust fan */
-  let blades;
-  (function(){ const g = G('fan'); const C = [-31, 17, -31]; const fm = M(0x222527, {roughness:.55}); const hubm = M(0x2c3033, {roughness:.5}); const stk = M(0xe2dcc8, {roughness:.7});
-    const s = rr(25, 25, 2); const hole = new THREE.Path(); hole.absarc(0, 0, 11.8, 0, Math.PI*2, true); s.holes.push(hole);
-    const fg = new THREE.ExtrudeGeometry(s, {depth:10, bevelEnabled:false, curveSegments:24}); fg.translate(0, 0, -5);
-    add(g, fg, fm, C[0], C[1], C[2]);
-    const hg = new THREE.CylinderGeometry(5.4, 5.4, 8, 28); hg.rotateX(Math.PI/2); add(g, hg, hubm, C[0], C[1], C[2]);
-    const sg = new THREE.CylinderGeometry(4, 4, .2, 28); sg.rotateX(Math.PI/2); add(g, sg, stk, C[0], C[1], C[2] + 4.1);
-    blades = new THREE.Group(); blades.position.set(C[0], C[1], C[2]); g.add(blades);
-    for (let i = 0; i < 7; i++){ const piv = new THREE.Group(); piv.rotation.z = i*2*Math.PI/7; const b = new THREE.Mesh(new THREE.BoxGeometry(5.9, 3.6, .6), fm); b.position.x = 8.3; b.rotation.x = .85; piv.add(b); blades.add(piv); }
+  /* 14 Restrictor and buffer */
+  (function(){ const g = G('rest'); const z = -52, y = 24;
+    const buf = clearM(.32, 0xf2c98a); const eg = new THREE.LineBasicMaterial({color:0x8c6a33, transparent:true, opacity:.8});
+    const box = B(g, 38, 24, 22, buf, -41, 4, -43);
+    const l = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(38, 24, 22)), eg); l.position.copy(box.position); g.add(l);
+    const body = M(0xdfe5e3, {roughness:.4}); const red = M(0xd8352a, {roughness:.35, transparent:true, opacity:.9}); const st = M(0xc9ced0, {metalness:.85, roughness:.25});
+    cyl(g, 2.8, HT - y, body, 0, y, z, 20);
+    xc(g, 3, 1.5, -3, body, y, z);
+    const hg = new THREE.CylinderGeometry(2.1, 3.2, 8, 20); hg.rotateZ(-Math.PI/2); add(g, hg, red, -7, y, z);
+    xc(g, .25, -11, -24, st, y, z, 10);
+    xc(g, 2.2, -22, -19, body, 12, -36);
   })();
 
-  /* 2 Sample chamber */
-  (function(){ const g = G('chamber'); const cx = -31, cz = 5;
-    const gas = M(0x1b1d1c, {roughness:.95}); const cl = clearM(); const ln = new THREE.LineBasicMaterial({color:0x5c9db2, transparent:true, opacity:.9});
-    ring(g, 38, 50, 1.5, 2, 1, gas, cx, 14.6, cz);
-    ring(g, 38, 50, 1.5, 2, 13.4, cl, cx, 15.6, cz);
-    slab(g, 38, 50, 1, 1.5, cl, cx, 29, cz);
-    edges(g, 38, 14.4, 50, ln, cx, 15.6, cz);
-    const nz = 33.7, nl = 7.4;
-    B(g, 18, .8, nl, cl, cx, 24.2, nz); B(g, 18, .8, nl, cl, cx, 16, nz); B(g, .8, 9, nl, cl, cx-8.6, 16, nz); B(g, .8, 9, nl, cl, cx+8.6, 16, nz);
-    edges(g, 18, 9, nl, ln, cx, 16, nz);
-    const meshM = new THREE.MeshStandardMaterial({map: canvasTex(18, 9, 12, drawMesh), transparent:true, depthWrite:false, roughness:.8, side:THREE.DoubleSide});
-    add(g, new THREE.PlaneGeometry(18, 9), meshM, cx, 20.5, 37.3);
-    const oz = -23, ol = 6;
-    B(g, 14, .8, ol, cl, cx, 25.2, oz); B(g, 14, .8, ol, cl, cx, 16, oz); B(g, .8, 10, ol, cl, cx-6.6, 16, oz); B(g, .8, 10, ol, cl, cx+6.6, 16, oz);
-    edges(g, 14, 10, ol, ln, cx, 16, oz);
+  /* 15 Pump. Datasheet: head Ø27 × 27.3, overall 45.3, motor Ø24, nozzle 6.1 long */
+  (function(){ const g = G('pump'); const y = 17.5, z = -44, x0 = 6;
+    const cream = M(0xeee6d0, {roughness:.55}); const blk = M(0x1b1c1d, {roughness:.5}); const can = M(0xb4bdc6, {metalness:.72, roughness:.3}); const tab = M(0xc9b47a, {metalness:.8, roughness:.3}); const foam = M(0x3b3f41, {roughness:1});
+    xc(g, 12, x0, x0+18, can, y, z);
+    xc(g, 13.5, x0+18, x0+27, cream, y, z);
+    xc(g, 13.6, x0+27, x0+28.4, blk, y, z);
+    xc(g, 13.5, x0+28.4, x0+37.5, cream, y, z);
+    xc(g, 13.6, x0+37.5, x0+38.6, blk, y, z);
+    xc(g, 13.5, x0+38.6, x0+45.3, cream, y, z);
+    xc(g, 2.15, x0+45.3, x0+51.4, cream, y, z, 16);
+    zc(g, 2.15, z+13, z+18, cream, x0+22, y, 16);
+    [[-5,0],[5,0]].forEach(([d]) => B(g, 4, .4, 1.6, tab, x0-2, y+d, z));
+    B(g, 44, 1, 26, foam, x0+24, 3, z);
+    [x0+9, x0+33].forEach(x => { const t = new THREE.TorusGeometry(x < x0+18 ? 13 : 14.5, 1.1, 10, 36, Math.PI); t.rotateY(Math.PI/2); t.rotateX(Math.PI); add(g, t, foam, x, y, z); });
   })();
 
-  /* Airflow */
-  const curve = new THREE.CatmullRomCurve3([[-31,-6,66],[-31,-1,56],[-31,4,47],[-31,12,41],[-31,21,32],[-34,23.5,20],[-29,25,7],[-33,24,-6],[-31,22,-16],[-31,20,-23],[-31,17,-31],[-31,17,-44],[-31,17,-68]].map(a => new THREE.Vector3(a[0], a[1], a[2])), false, 'centripetal');
-  const N = 90; const pArr = new Float32Array(N*3); const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute('position', new THREE.BufferAttribute(pArr, 3));
-  const seeds = []; for (let i = 0; i < N; i++) seeds.push({p: i/N, a: Math.random()*2-1, b: Math.random()*2-1});
+  /* Flexible runs: tube geometry follows the parts as they explode */
+  const silicone = new THREE.MeshStandardMaterial({color:0xe9ecea, roughness:.5, transparent:true, opacity:.82});
+  const fep = new THREE.MeshStandardMaterial({color:0xd7eef5, roughness:.2, transparent:true, opacity:.6});
+  const cols = {red:M(0xc73a30), blk:M(0x1a1b1c), yel:M(0xdcb02f), org:M(0xd97a24), brn:M(0x6e4a2c), blu:M(0x2a62b8)};
+  const flex = [];
+  function run(group, a, b, pts, r, mat){ const m = new THREE.Mesh(new THREE.BufferGeometry(), mat); G(group).add(m); flex.push({m, a:byId[a], b:byId[b], p:pts.map(q => new THREE.Vector3().fromArray(q)), r}); }
+  [-1, 1].forEach(s => { const id = s < 0 ? 'noseS' : 'noseR'; const x = s*NX;
+    run('tubes', id, 'valve', [[x,AY,38],[x,AY,34],[s*12,AY,29],[s*9.6,AY,28]], 2.4, fep); });
+  run('tubes', 'chamber', 'rest', [[0,HT+.2,-52],[0,31,-52]], 2.4, fep);
+  run('tubes', 'rest', 'pump', [[-20,12,-36],[-14,10,-30],[0,10,-27],[20,13,-26],[28,17.5,-26.3]], 2.5, silicone);
+  run('tubes', 'pump', 'tray', [[57.2,17.5,-44],[60.5,17.5,-46],[55,17.5,-54],[55,17.5,-62.4]], 2.5, silicone);
+  /* Figaro wires: three per module */
+  (function(){ const faceY = HT + 13 + .6 + FIG.legs, wy = faceY - 1.3, tip = FIG.x - FIG.endOff + FIG.L + 15; const wc = ['red','blk','yel'];
+    FIG.zs.forEach((z, r) => {
+      wc.forEach((c, i) => { const d = (i-1)*2.54;
+        run('wires', 'fig', 'hub', [[-tip,wy,z+d],[-tip-3,wy-1,z+d],[-tip-3,wy-7,z+d*.8],[-46,HT+12,z+d*.8],[-42,HT+7.2,z+d*.8]], .55, cols[c]);
+        const jx = r === 0 ? 40 : 50;
+        run('wires', 'fig', 'hub', [[tip,wy,z+d],[tip+2,wy-.5,z+d],[tip+4,wy-1.5,z+d*.7+2],[56+r*2,wy-2,-8+d*.6],[jx+4,HT+11,1],[jx+d*.8,HT+7.2,5]], .55, cols[c]);
+      });
+    }); })();
+  run('wires', 'pump', 'hub', [[4,20,-44],[2,26,-41],[5,28.6,-34],[6.5,28,-26]], .6, cols.red);
+  run('wires', 'pump', 'hub', [[4,15,-44],[0,22,-38],[6,27,-31],[9.5,28,-26]], .6, cols.blk);
+  run('wires', 'batt', 'hub', [[36.5,16,-9],[42,18,-9],[44,24,-8.4],[43,28,-8]], .7, cols.red);
+  run('wires', 'batt', 'hub', [[36.5,12,-13],[43,15,-12],[46,24,-10],[45.5,28,-8]], .7, cols.blk);
+  [['org',-1.6],['red',0],['brn',1.6]].forEach(([c,d]) => run('wires', 'servo', 'hub', [[6.2,12,43+d*.2],[12,12+d*.6,44],[19,20,40],[20+d,26,31],[20+d,28,30]], .5, cols[c]));
+
+  byId.tubes.ancF = flex[0]; byId.wires.ancF = flex[5];
+  let lastE = -1;
+  function updateFlex(){
+    if (Math.abs(state.e - lastE) < 1e-4) return; lastE = state.e;
+    const pA = new THREE.Vector3(), pts = [];
+    flex.forEach(f => { pts.length = 0; const n = f.p.length;
+      f.p.forEach((q, i) => { const w = n > 1 ? i/(n-1) : 0; pA.copy(q).addScaledVector(f.a.offV, state.e*(1-w)).addScaledVector(f.b.offV, state.e*w); pts.push(pA.clone()); });
+      const seg = Math.max(10, n*5); const g = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, false, 'centripetal'), seg, f.r, 7, false);
+      f.m.geometry.dispose(); f.m.geometry = g; });
+  }
+
+  /* Airflow particles */
+  const tail = [[0,AY,28],[0,AY,20],[0,AY,14],[-5,40,8],[5,41.8,-2],[-6,41,-11],[7,40,-20],[-7,37,-28],[7,36,-37],[-6,36.5,-44],[0,36,-51],[0,31,-52],[0,25,-52],[-9,24,-52],[-22,24,-52],[-34,20,-46],[-24,12,-37],[-14,10,-30],[0,10,-27],[20,13,-26],[28,17.5,-27],[28,17.5,-36],[42,17.5,-44],[57,17.5,-44],[60.5,17.5,-46],[55,17.5,-54],[55,17.5,-63],[55,17.5,-92]];
+  const mkCurve = s => new THREE.CatmullRomCurve3([[s*NX,AY,118],[s*NX,AY,94],[s*NX,AY,72],[s*NX,AY,42],[s*NX,AY,34],[s*12,AY,29],[s*7,AY,28]].concat(tail).map(a => new THREE.Vector3(a[0], a[1], a[2])), false, 'centripetal');
+  const curves = {samp:mkCurve(-1), ref:mkCurve(1)};
+  const N = 120; const pArr = new Float32Array(N*3); const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute('position', new THREE.BufferAttribute(pArr, 3));
+  const seeds = []; for (let i = 0; i < N; i++) seeds.push({p: i/N, a: Math.random()*2-1, b: Math.random()*2-1, c:Math.random()});
   const sprite = (function(){ const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'); const gr = g.createRadialGradient(32,32,0,32,32,32); gr.addColorStop(0,'rgba(255,255,255,1)'); gr.addColorStop(.45,'rgba(255,255,255,.85)'); gr.addColorStop(1,'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0,0,64,64); return new THREE.CanvasTexture(c); })();
-  const pMat = new THREE.PointsMaterial({size:2.8, map:sprite, transparent:true, depthWrite:false, opacity:0});
-  const pts = new THREE.Points(pGeo, pMat); pts.frustumCulled = false; scene.add(pts);
-  const pLineMat = new THREE.LineBasicMaterial({transparent:true, opacity:0});
-  const pLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints(curve.getSpacedPoints(120)), pLineMat); scene.add(pLine);
+  const pMat = new THREE.PointsMaterial({size:4.6, map:sprite, transparent:true, depthWrite:false, depthTest:false, opacity:0});
+  const pts = new THREE.Points(pGeo, pMat); pts.frustumCulled = false; pts.renderOrder = 5; scene.add(pts);
+  const pLineMat = new THREE.LineBasicMaterial({transparent:true, opacity:0, depthTest:false});
+  const pLine = new THREE.Line(new THREE.BufferGeometry(), pLineMat); pLine.frustumCulled = false; pLine.renderOrder = 4; scene.add(pLine);
+  const lines = {samp:curves.samp.getSpacedPoints(220), ref:curves.ref.getSpacedPoints(220)};
+  let lineKey = '';
   const tmp2 = new THREE.Vector3(); let time = 0;
-  function updParticles(){ for (let i = 0; i < N; i++){ const s = seeds[i]; const t = (s.p + time*.12) % 1; curve.getPointAt(t, tmp2); const w = Math.sin(t*Math.PI); pArr[i*3] = tmp2.x + s.a*3.2*w; pArr[i*3+1] = tmp2.y + s.b*2.4*w; pArr[i*3+2] = tmp2.z; } pGeo.attributes.position.needsUpdate = true; }
+  function updParticles(){
+    const v = VALVE[state.valve].air;
+    if (v === 'hold'){
+      for (let i = 0; i < N; i++){ const s = seeds[i]; pArr[i*3] = s.a*15; pArr[i*3+1] = 37.5 + s.b*4 + .3*Math.sin(time*1.1 + i); pArr[i*3+2] = -22 + (s.c-.5)*66 + .5*Math.cos(time*.8 + i); }
+    } else {
+      const c = curves[v];
+      for (let i = 0; i < N; i++){ const s = seeds[i]; const t = (s.p + time*.085) % 1; c.getPointAt(t, tmp2); const w = Math.max(0, Math.min(1, (tmp2.z < 15 && tmp2.z > -56 && tmp2.y > 34) ? 1 : .18)); pArr[i*3] = tmp2.x + s.a*5.5*w; pArr[i*3+1] = tmp2.y + s.b*2.6*w; pArr[i*3+2] = tmp2.z; }
+    }
+    pGeo.attributes.position.needsUpdate = true;
+    if (lineKey !== v){ lineKey = v; pLine.visible = v !== 'hold'; if (v !== 'hold') pLine.geometry.setFromPoints(lines[v]); }
+  }
   updParticles();
 
   /* Theme */
-  let grid = null;
+  let grid = null; let airC = new THREE.Color(), odorC = new THREE.Color();
+  function setAirColor(){ const c = VALVE[state.valve].air === 'samp' ? odorC : airC; pMat.color.copy(c); pLineMat.color.copy(c); }
   function applyTheme(){
     const cs = getComputedStyle(document.documentElement); const v = n => cs.getPropertyValue(n).trim();
     renderer.setClearColor(new THREE.Color(v('--stage') || '#dce3df'), 1);
     if (grid){ scene.remove(grid); grid.geometry.dispose(); grid.material.dispose(); }
-    grid = new THREE.GridHelper(420, 42, new THREE.Color(v('--grid-a') || '#a7b4ae'), new THREE.Color(v('--grid-b') || '#c4cdc8'));
-    grid.position.y = -66; scene.add(grid);
-    const air = new THREE.Color(v('--air') || '#0c7d9e'); pMat.color.copy(air); pLineMat.color.copy(air);
+    grid = new THREE.GridHelper(760, 76, new THREE.Color(v('--grid-a') || '#a7b4ae'), new THREE.Color(v('--grid-b') || '#c4cdc8'));
+    grid.position.y = -110; scene.add(grid);
+    airC = new THREE.Color(v('--air') || '#0c7d9e'); odorC = new THREE.Color(v('--odor') || '#b4560f'); setAirColor();
   }
   applyTheme();
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
@@ -543,11 +815,17 @@ function build3D(){
   /* Selection look */
   const eachMat = (o, fn) => { if (!o.material) return; (Array.isArray(o.material) ? o.material : [o.material]).forEach(fn); };
   PARTS.forEach(p => p.group.traverse(o => eachMat(o, m => { if (m.userData.op0 === undefined){ m.userData.op0 = m.opacity; m.userData.tr0 = m.transparent; m.userData.dw0 = m.depthWrite; } })));
+  const SHELL = {lid:.1, tray:.12, shroud:.22, chamber:.32};
+  const AIRDIM = {hub:.28, fig:.4, esp:.35, batt:.5, servo:.5, bme:.9};
+  const WIRED = {hub:1, wires:1, fig:1, bme:1, esp:1, batt:1, pump:1, servo:1};
   function applyLook(){
     PARTS.forEach(p => {
-      const dim = state.sel && state.sel !== p.id; const shell = state.see && (p.id === 'lid' || p.id === 'tray');
-      const f = (shell ? .14 : 1) * (dim ? .1 : 1);
-      p.group.traverse(o => { let eop = 1; eachMat(o, m => { const u = m.userData; const op = u.op0 * f; m.opacity = op; const tr = op < .999 || u.tr0; if (m.transparent !== tr){ m.transparent = tr; m.needsUpdate = true; } m.depthWrite = op < .999 ? false : u.dw0; eop = op; }); o.userData.eop = eop; });
+      const dim = state.sel && state.sel !== p.id;
+      const see = (state.see || state.air || state.wire) && SHELL[p.id];
+      let f = (see ? SHELL[p.id] : 1) * (dim ? .1 : 1);
+      if (state.wire && !WIRED[p.id] && !see) f *= .16;
+      if (state.air && AIRDIM[p.id]) f *= AIRDIM[p.id];
+      p.group.traverse(o => { let eop = 1; eachMat(o, m => { const u = m.userData; if (u.op0 === undefined) return; const op = u.op0 * f; m.opacity = op; const tr = op < .999 || u.tr0; if (m.transparent !== tr){ m.transparent = tr; m.needsUpdate = true; } m.depthWrite = op < .999 ? false : u.dw0; eop = op; }); o.userData.eop = eop; });
     });
   }
 
@@ -579,7 +857,8 @@ function build3D(){
   function placeCallouts(){
     PARTS.forEach(p => {
       const show = state.balls && (state.e > .22 || state.sel === p.id);
-      tmp.copy(p.ancV).add(p.group.position).project(camera);
+      if (p.ancF){ const f = p.ancF, k = Math.floor(f.p.length/2), w = k/(f.p.length-1); tmp.copy(f.p[k]).addScaledVector(f.a.offV, state.e*(1-w)).addScaledVector(f.b.offV, state.e*w); } else tmp.copy(p.ancV).addScaledVector(p.offV, state.e);
+      tmp.project(camera);
       const vis = show && tmp.z < 1 && Math.abs(tmp.x) < 1.05 && Math.abs(tmp.y) < 1.05;
       p.el.classList.toggle('on', vis); p.el.classList.toggle('sel', state.sel === p.id);
       if (vis) p.el.style.transform = 'translate(' + ((tmp.x+1)/2*W).toFixed(1) + 'px,' + ((1-tmp.y)/2*H).toFixed(1) + 'px)';
@@ -588,28 +867,32 @@ function build3D(){
 
   /* Size + camera */
   function resize(){ const r = stage.getBoundingClientRect(); W = Math.max(1, r.width); H = Math.max(1, r.height); renderer.setSize(W, H); camera.aspect = W/H; camera.updateProjectionMatrix(); }
-  function fit(){ const asp = W/H; const dist = asp >= 1.1 ? 470 : 470 * (1 + (1.1 - asp) * .4); const dir = new THREE.Vector3(-.56, .44, .70).normalize(); controls.target.set(0, 20, 0); camera.position.copy(controls.target).addScaledVector(dir, dist); controls.update(); }
+  function fit(){ const asp = W/H; const k = state.eT; const base = 500 + 650*k; const dist = asp >= 1.05 ? base : base * (1 + (1.05 - asp) * .6); const dir = new THREE.Vector3(-.5, .36, .78).normalize(); controls.target.set(0, 32 + 42*k, 24*k); camera.position.copy(controls.target).addScaledVector(dir, dist); controls.update(); }
   resize(); fit();
   new ResizeObserver(resize).observe(stage);
 
   /* Loop */
   const clock = new THREE.Clock();
-  function frame(){
-    const dt = Math.min(clock.getDelta(), .05);
+  function step(dt){
     if (state.e !== state.eT){ state.e += (state.eT - state.e) * (reduce ? 1 : Math.min(1, dt*5)); if (Math.abs(state.eT - state.e) < .001) state.e = state.eT; }
     PARTS.forEach(p => p.group.position.copy(p.offV).multiplyScalar(state.e));
+    updateFlex();
+    const target = VALVE[state.valve].a; const dv = target - state.va;
+    if (dv !== 0){ state.va += reduce ? dv : Math.sign(dv)*Math.min(Math.abs(dv), dt*5.5); }
+    plug.rotation.y = state.va; horn.rotation.y = state.va;
+    const open = VALVE[state.valve].air;
+    glows.noseS.opacity = (open === 'samp' ? 1 : .18) * (state.see ? .8 : 1); glows.noseR.opacity = (open === 'ref' ? 1 : .18) * (state.see ? .8 : 1);
     const aop = state.air ? Math.max(0, 1 - state.e*3.5) : 0;
-    pMat.opacity = aop; pLineMat.opacity = aop*.35; pts.visible = pLine.visible = aop > .01;
+    pMat.opacity = aop; pLineMat.opacity = aop*.4; pts.visible = aop > .01; if (lineKey !== 'hold' && aop > .01) pLine.visible = true; else if (aop <= .01) pLine.visible = false;
     if (pts.visible){ if (!reduce) time += dt; updParticles(); }
-    if (state.air) blades.rotation.z += dt * (reduce ? 3 : 16);
-    noseGlow.forEach(m => { m.opacity = state.air && !reduce ? .7 + .3 * Math.sin(clock.elapsedTime * 5) : 1; });
+    if (state.cycle >= 0 && !reduce){ state.cycleT += dt; if (state.cycleT >= PHASES[state.cycle].s/10){ state.cycleT = 0; nextPhase(); } }
     controls.autoRotate = state.spin; controls.update();
     renderer.render(scene, camera);
     placeCallouts();
-    requestAnimationFrame(frame);
   }
+  function frame(){ step(Math.min(clock.getDelta(), .05)); requestAnimationFrame(frame); }
   requestAnimationFrame(frame);
-  return {applyLook: applyLook, fit: fit};
+  return {applyLook, fit, setAirColor, camera, controls, step, parts:PARTS};
 }
 
 /* ---------- UI ---------- */
@@ -617,18 +900,24 @@ let gl = null;
 function syncUI(){
   $('explode').value = Math.round(state.eT*100); $('explodeOut').textContent = Math.round(state.eT*100) + '%';
   $('btnAsm').setAttribute('aria-pressed', String(state.eT === 0)); $('btnExp').setAttribute('aria-pressed', String(state.eT === 1));
-  [['tSee','see'],['tAir','air'],['tBal','balls'],['tSpin','spin']].forEach(([id,k]) => $(id).setAttribute('aria-pressed', String(state[k])));
+  [['tSee','see'],['tAir','air'],['tWire','wire'],['tBal','balls'],['tSpin','spin']].forEach(([id,k]) => $(id).setAttribute('aria-pressed', String(state[k])));
+  [['vRef','ref'],['vHold','hold'],['vSamp','samp']].forEach(([id,v]) => $(id).setAttribute('aria-pressed', String(state.valve === v)));
 }
-function toggleAir(){ state.air = !state.air; if (state.air){ state.eT = 0; state.see = true; if (gl) gl.applyLook(); } syncUI(); if (!state.sel) renderDetail(); }
+function setValve(v){ state.valve = v; if (gl) gl.setAirColor(); syncUI(); if (!state.sel) renderDetail(); }
+function nextPhase(){ state.cycle += 1; if (state.cycle >= PHASES.length){ state.cycle = -1; setValve('ref'); return; } setValve(PHASES[state.cycle].v); }
+function runCycle(){ if (state.cycle >= 0){ state.cycle = -1; renderDetail(); return; } state.air = true; state.eT = 0; if (gl){ gl.applyLook(); gl.fit(); } state.cycleT = 0; state.cycle = 0; setValve(PHASES[0].v); }
+function toggleAir(){ state.air = !state.air; if (state.air) state.eT = 0; if (gl){ gl.applyLook(); if (state.air) gl.fit(); } syncUI(); if (!state.sel) renderDetail(); }
 function renderDetail(){
   const d = $('detail'); const p = state.sel && byId[state.sel];
   if (!p){
-    d.innerHTML = '<p class="eyebrow">Air path</p><h3>Front in, back out</h3>' +
-      '<ol class="flow"><li>Nostrils</li><li>Sample chamber</li><li>Exhaust fan</li><li>Rear slots</li></ol>' +
-      '<p>Air enters through the nose at the front, passes through the sealed chamber over the BME690 and ENS160 sensors, then leaves through the fan at the back. The fan sits downstream, so its motor heat and smell stay out of the sample.</p>' +
-      '<button type="button" class="btn" id="dAir">' + (state.air ? 'Hide airflow' : 'Show airflow') + '</button>' +
-      '<p class="hint-s">Tap a part or a balloon for its details.</p>';
-    $('dAir').addEventListener('click', toggleAir); return;
+    const v = VALVE[state.valve];
+    d.innerHTML = '<p class="eyebrow">Air path · valve position</p><h3>' + v.title + '</h3>' +
+      '<ol class="flow">' + v.flow.map(s => '<li>' + s + '</li>').join('') + '</ol><p>' + v.text + '</p>' +
+      '<ol class="phases" aria-label="Sniff cycle, starting durations">' + PHASES.map((ph,i) => '<li class="' + (state.cycle === i ? 'now' : '') + '"><b>' + ph.label + '</b>' + ph.s + ' s</li>').join('') + '</ol>' +
+      '<div class="btnrow"><button type="button" class="btn" id="dCyc">' + (state.cycle >= 0 ? 'Stop cycle' : 'Play sniff cycle') + '</button>' +
+      '<button type="button" class="btn ghost" id="dAir">' + (state.air ? 'Hide airflow' : 'Show airflow') + '</button></div>' +
+      '<p class="hint-s">Tap a part or a balloon for its details. The cycle plays at 10× speed.</p>';
+    $('dAir').addEventListener('click', toggleAir); $('dCyc').addEventListener('click', runCycle); return;
   }
   d.innerHTML = '<p class="eyebrow">Item ' + p.n + '</p><h3>' + p.name + '</h3>' +
     '<dl class="kv"><div><dt>Size (mm)</dt><dd>' + p.size + '</dd></div><div><dt>Qty</dt><dd>' + p.qty + '</dd></div><div><dt>Source</dt><dd><span class="src ' + p.src + '">' + SRC[p.src] + '</span></dd></div></dl>' +
@@ -652,10 +941,14 @@ PARTS.forEach(p => {
 });
 
 $('explode').addEventListener('input', e => { state.eT = Number(e.target.value)/100; state.e = state.eT; syncUI(); });
-$('btnAsm').addEventListener('click', () => { state.eT = 0; syncUI(); });
-$('btnExp').addEventListener('click', () => { state.eT = 1; syncUI(); });
+$('btnAsm').addEventListener('click', () => { state.eT = 0; syncUI(); if (gl) gl.fit(); });
+$('btnExp').addEventListener('click', () => { state.eT = 1; syncUI(); if (gl) gl.fit(); });
+$('vRef').addEventListener('click', () => { state.cycle = -1; setValve('ref'); });
+$('vHold').addEventListener('click', () => { state.cycle = -1; setValve('hold'); });
+$('vSamp').addEventListener('click', () => { state.cycle = -1; setValve('samp'); });
 $('tSee').addEventListener('click', () => { state.see = !state.see; if (gl) gl.applyLook(); syncUI(); });
 $('tAir').addEventListener('click', toggleAir);
+$('tWire').addEventListener('click', () => { state.wire = !state.wire; if (state.wire) state.air = false; if (gl) gl.applyLook(); syncUI(); if (!state.sel) renderDetail(); });
 $('tBal').addEventListener('click', () => { state.balls = !state.balls; syncUI(); });
 $('tSpin').addEventListener('click', () => { state.spin = !state.spin; syncUI(); });
 $('reset').addEventListener('click', () => { if (gl) gl.fit(); });
@@ -663,12 +956,12 @@ $('reset').addEventListener('click', () => { if (gl) gl.fit(); });
 try {
   if (!window.THREE || !THREE.OrbitControls) throw new Error('3D library did not load');
   gl = build3D();
+  window.__sniff = {state, gl, setValve, syncUI};
 } catch (err) {
   console.error(err); $('noGL').hidden = false; $('reset').hidden = true; $('callouts').hidden = true; state.e = state.eT;
 }
 syncUI(); renderDetail();
 })();
 </script>
-
 </body>
 </html>
