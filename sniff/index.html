@@ -146,6 +146,22 @@ table.hubt td:last-child{text-align:left}
 table.hubt td{font-size:13.5px;vertical-align:top}
 .src.es::before{background:linear-gradient(90deg,var(--accent) 50%,var(--warn) 50%)}
 </style>
+<style>
+/* Rev C additions */
+.src.ms::before{background:var(--air)}
+.src.ds::before{background:var(--accent)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0;padding:0;list-style:none;font:500 12.5px/1.2 var(--f-mono);color:var(--ink-2)}
+.legend li{display:flex;align-items:center;gap:6px}
+.legend i{width:18px;height:6px;border-radius:3px;border:1px solid var(--rule);display:inline-block}
+.wide{margin-top:16px;background:var(--sheet);border:1.5px solid var(--ink);padding:16px 18px}
+.wide h2{margin:0 0 10px;font:600 13px/1 var(--f-display);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
+.wide ol{margin:0;padding-left:20px;display:grid;gap:6px;max-width:100ch}
+.wide li{line-height:1.45}
+table.pins td:nth-child(2){white-space:nowrap}
+table.pins td:last-child{text-align:left;color:var(--ink-2);font-size:13px}
+td.matc{font-size:13px;color:var(--ink-2)}
+.ball{width:auto;min-width:22px;padding:0 4px;border-radius:11px}
+</style>
 
 <div class="wrap">
   <header class="titlebar">
@@ -155,10 +171,10 @@ table.hubt td{font-size:13.5px;vertical-align:top}
       <p class="tb-sub">Sensor Network for Intelligent Fragrance Fingerprinting</p>
     </div>
     <dl class="tb-cells">
-      <div><dt>Rev</dt><dd>B</dd></div>
+      <div><dt>Rev</dt><dd>C</dd></div>
       <div><dt>Units</dt><dd>mm</dd></div>
-      <div><dt>Date</dt><dd>2026-11-01</dd></div>
-      <div><dt>Items</dt><dd>17</dd></div>
+      <div><dt>Date</dt><dd>2026-11-11</dd></div>
+      <div><dt>Items</dt><dd id="itemCount">17</dd></div>
     </dl>
   </header>
 
@@ -184,13 +200,26 @@ table.hubt td{font-size:13.5px;vertical-align:top}
           <button type="button" id="vHold" aria-pressed="false">Hold</button>
           <button type="button" id="vSamp" aria-pressed="false">Sample</button>
         </div>
+        <div class="row"><span class="label" id="yLab">Valve type</span></div>
+        <div class="seg" role="group" aria-labelledby="yLab">
+          <button type="button" id="ytMed" aria-pressed="true">Medical stopcock</button>
+          <button type="button" id="ytHam" aria-pressed="false">Hamilton HV</button>
+        </div>
         <div class="toggles">
           <button type="button" class="tog" id="tSee" aria-pressed="false">See-through</button>
           <button type="button" class="tog" id="tAir" aria-pressed="false">Airflow</button>
+          <button type="button" class="tog" id="tSec" aria-pressed="false">Section</button>
           <button type="button" class="tog" id="tWire" aria-pressed="false">Hub wiring</button>
           <button type="button" class="tog" id="tBal" aria-pressed="true">Balloons</button>
           <button type="button" class="tog" id="tSpin" aria-pressed="false">Spin</button>
         </div>
+        <ul class="legend" aria-label="Tube and fitting colors">
+          <li><i style="background:#3fb4dc"></i>PFA tube</li>
+          <li><i style="background:#efe7cf"></i>Silicone tube</li>
+          <li><i style="background:#f4f6f5"></i>Luer and nut</li>
+          <li><i style="background:#b9c0c2"></i>Aluminum</li>
+          <li><i style="background:#2b2d2c"></i>FKM seal</li>
+        </ul>
       </section>
 
       <section class="detail" id="detail" aria-live="polite"></section>
@@ -198,33 +227,23 @@ table.hubt td{font-size:13.5px;vertical-align:top}
       <section class="bom" aria-labelledby="dH">
         <h2 id="dH">Air path decisions</h2>
         <dl class="dec">
-          <div><dt>Pump pulls from behind the sensors</dt><dd>The pump's inlet connects after the chamber, so its heat, motor smell and pulses stay out of the sample. Exhaust leaves at the rear, far from the nostrils.</dd></div>
-          <div><dt>Two nostrils, one job each</dt><dd>The sample side has only a dust filter. The clean-air side holds about 1.8 g of activated carbon between two particle filters. It screws out for replacement.</dd></div>
-          <div><dt>Servo turns a 3-way valve</dt><dd>A sliding shutter would connect the two nostrils and leak room air, so the servo turns a sealed Luer stopcock instead. It holds position with the servo unpowered and adds a third state that seals the chamber.</dd></div>
-          <div><dt>A small restriction sets the flow</dt><dd>A 25 G dispensing tip drops about 13 kPa at 300 mL/min, while the carbon bed drops about 6 Pa. The tip dominates, so both nostrils draw nearly the same flow and the sensors see no cooling step when the valve moves.</dd></div>
-          <div><dt>Buffer smooths the pulses</dt><dd>A 13 mL volume between the tip and the pump acts as a pneumatic low-pass filter, with a corner near 0.5 Hz, well below the pump's pulse rate.</dd></div>
-          <div><dt>Only the Figaro cans enter the chamber</dt><dd>Each module sits upside down on the chamber lid with its can sealed through a hole. The trimmer, comparator and flux stay outside the sample.</dd></div>
-          <div><dt>BME690s come first</dt><dd>Hot MOX cans warm the air and burn off a little of the odor, so the BME690s read it upstream of them.</dd></div>
-          <div><dt>Pump runs from the battery</dt><dd>The datasheet use range is 3.0–4.5 V, so a 5 V rail is outside it. Battery power also keeps motor noise off the 5 V heater rail.</dd></div>
+          <div><dt>Straight sample path</dt><dd>The sample nostril, the valve and the chamber inlet are on one line. The medical stopcock has no upstream tube. The Hamilton valve has one short PFA tube.</dd></div>
+          <div><dt>Pump pulls from behind the sensors</dt><dd>The pump inlet is after the chamber, the restrictor and the buffer. Its heat, motor smell and pulses stay out of the sample. The exhaust goes out at the rear.</dd></div>
+          <div><dt>One-piece aluminum chamber</dt><dd>The block is open at the bottom and seals to the hub with one FKM gasket. The shuttle is fully inside. There is no lid joint.</dd></div>
+          <div><dt>BME690s come first</dt><dd>Hot MOX cans warm the air and use some of the odor, so the BME690s read the air upstream of the cans.</dd></div>
+          <div><dt>Only the Figaro cans enter the chamber</dt><dd>Each module is upside down on the chamber top. An FKM O-ring seals each can body. The trim pot, comparator and flux stay outside.</dd></div>
+          <div><dt>A small restriction sets the flow</dt><dd>A 25 G tip drops about 13 kPa at 300 mL/min. The carbon bed drops about 6 Pa. So the two nostrils draw almost the same flow.</dd></div>
+          <div><dt>Low pressure only after the tip</dt><dd>The chamber is near room pressure during flow. Only the buffer and the pump tube are at about −13 kPa, and their joints are threads, gaskets and clamped silicone.</dd></div>
+          <div><dt>Wetted materials</dt><dd>Aluminum 6061, FKM, PFA and PTFE tape, plus parts that cannot change: the stopcock, the polypropylene liners, the shuttle board, the cans, the mesh and the membrane. No silicone before the buffer.</dd></div>
         </dl>
       </section>
 
       <section class="bom" aria-labelledby="cH">
-        <h2 id="cH">Calculated targets</h2>
+        <h2 id="cH">Calculated values</h2>
         <div class="tablewrap">
-          <table class="plain">
-            <tbody>
-              <tr><td>Flow</td><td class="mono">300 mL/min</td></tr>
-              <tr><td>Chamber volume, net</td><td class="mono">≈ 20 mL</td></tr>
-              <tr><td>Time for one air change</td><td class="mono">≈ 4 s</td></tr>
-              <tr><td>Time to 95% new air</td><td class="mono">≈ 12 s</td></tr>
-              <tr><td>Carbon contact time</td><td class="mono">≈ 0.8 s</td></tr>
-              <tr><td>Average power</td><td class="mono">≈ 2.3 W</td></tr>
-              <tr><td>Runtime on one 18650</td><td class="mono">≈ 5 h</td></tr>
-            </tbody>
-          </table>
+          <table class="plain"><tbody id="calcBody"></tbody></table>
         </div>
-        <p class="note">These are hand calculations for a starting point. Measure flow and pump current on the bench before relying on them.</p>
+        <p class="note">The page calculates these values from the constants block for the selected valve type. Power and runtime are hand estimates. Measure flow and pump current on the bench.</p>
       </section>
 
       <section class="bom" aria-labelledby="hH">
@@ -233,31 +252,47 @@ table.hubt td{font-size:13.5px;vertical-align:top}
           <table class="plain hubt">
             <thead><tr><th scope="col">Conn.</th><th scope="col">Device</th><th scope="col">Hub side</th></tr></thead>
             <tbody>
-              <tr><td class="mono">J1</td><td>BME690 shuttle</td><td>3.3 V sensor rail, VSPI, 8 CS lines</td></tr>
-              <tr><td class="mono">J10–13</td><td>Figaro modules</td><td>5 V heater rail, AOUT through a 2:1 divider to ADS1115 A0–A3</td></tr>
-              <tr><td class="mono">U3</td><td>ADS1115</td><td>I²C on GPIO21/22</td></tr>
-              <tr><td class="mono">J20</td><td>18650 cell</td><td>Protection, charger, power switch</td></tr>
-              <tr><td class="mono">J21</td><td>Pump</td><td>Battery rail, Q1 and flyback diode, PWM on GPIO4</td></tr>
-              <tr><td class="mono">J22</td><td>Servo</td><td>5 V through load switch Q2 on GPIO2, signal on GPIO14</td></tr>
-              <tr><td class="mono">U1</td><td>ESP32 devkit</td><td>Stacked on headers; battery sense on GPIO34</td></tr>
+              <tr><td class="mono">J1</td><td>BME690 shuttle</td><td>3.3 V sensor rail from LDO U4, SPI2, 8 CS lines</td></tr>
+              <tr><td class="mono">J10–11</td><td>Figaro modules</td><td>5 V heater rail, AOUT through a 2:1 divider to ADS1115 A0–A1. A2–A3 not used</td></tr>
+              <tr><td class="mono">U3</td><td>ADS1115</td><td>I²C on GPIO8 / GPIO9</td></tr>
+              <tr><td class="mono">J20</td><td>18650 cell</td><td>Protection, charger U7, USB-C, power switch</td></tr>
+              <tr><td class="mono">J21</td><td>Pump</td><td>Battery rail, low-side Q1 and flyback diode D1, PWM on GPIO21</td></tr>
+              <tr><td class="mono">J22</td><td>Servo MG90S</td><td>5 V through load switch Q2 on GPIO10, signal on GPIO14</td></tr>
+              <tr><td class="mono">U1</td><td>ESP32-S3 dev board</td><td>On sockets. Battery sense on GPIO1 through a divider</td></tr>
             </tbody>
           </table>
         </div>
-        <p class="note">GPIO choices avoid the pins already proposed for the shuttle. Using GPIO4 for the pump gives up the optional shuttle EEPROM read.</p>
       </section>
 
-      <section class="bom" aria-labelledby="bomH">
-        <h2 id="bomH">Bill of materials</h2>
+      <section class="bom" aria-labelledby="pH">
+        <h2 id="pH">ESP32-S3 pin map</h2>
         <div class="tablewrap">
-          <table>
-            <thead><tr><th scope="col">#</th><th scope="col">Part</th><th scope="col">Qty</th><th scope="col">Size</th><th scope="col">Source</th></tr></thead>
-            <tbody id="bomBody"></tbody>
+          <table class="plain pins">
+            <thead><tr><th scope="col">Function</th><th scope="col">GPIO</th><th scope="col">Note</th></tr></thead>
+            <tbody id="pinBody"></tbody>
           </table>
         </div>
-        <p class="note">Pump, shuttle board, ESP32 module and Figaro can sizes come from datasheets. The Figaro module board is estimated from your photo, so measure it before printing mounts. Parts marked Assumed use placeholder sizes.</p>
+        <p class="note">Not used: GPIO0, 3, 45, 46 (strapping), GPIO19 and 20 (USB), GPIO26 to 32 (flash and PSRAM), GPIO33 to 37 (octal PSRAM), GPIO39 to 42 (JTAG), GPIO43 and 44 (UART0). GPIO22 to 25 do not exist.</p>
       </section>
+
     </aside>
   </main>
+
+  <section class="wide" aria-labelledby="bomH">
+    <h2 id="bomH">Bill of materials</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th scope="col">Ref</th><th scope="col">Part</th><th scope="col">Qty</th><th scope="col">Key dimensions (mm)</th><th scope="col">Material</th><th scope="col">Source tag</th></tr></thead>
+        <tbody id="bomBody"></tbody>
+      </table>
+    </div>
+    <p class="note" style="margin-top:10px;max-width:100ch">DATASHEET: the size comes from a datasheet or drawing. MEASURED: you measured the part. ASSUMED: a placeholder, or a size that we select for our own part. Measure all ASSUMED purchased parts before you make mounts. Tap a row to select the part in the model.</p>
+  </section>
+
+  <section class="wide" aria-labelledby="clH">
+    <h2 id="clH">Change log, Rev B to Rev C</h2>
+    <ol id="clBody"></ol>
+  </section>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -265,132 +300,398 @@ table.hubt td{font-size:13.5px;vertical-align:top}
 <script>
 (function(){
 'use strict';
-const $ = id => document.getElementById(id);
+/*<DATA>*/
+/* =====================================================================================
+   CONSTANTS BLOCK. Every dimension of the model is here. Units: mm (volumes in mL).
+   Source tag of each value:  DS = DATASHEET   MS = MEASURED   AS = ASSUMED
+   AS also marks dimensions that we select for our own parts (design values).
+   Change a value here and the model, the BOM numbers and the calculated values follow.
+   ===================================================================================== */
+const TAG = {ds:'DATASHEET', ms:'MEASURED', as:'ASSUMED'};
+const DIM = {
+  flow: 300,                                                                 /* mL/min, FIXED target */
+  enc:   {W:136, D:130, H:63, wall:2.5, r:10, split:36, winW:64, winY0:24, winY1:56},              /* AS  enclosure, our design */
+  hub:   {W:127, D:121, t:1.6, top:33.6, cutX:30, cutZ:16,
+          holes:[[-60,-57],[22,-57],[60,6],[60,57],[-60,10]]},                                   /* AS  hub PCB, our design */
+  axis:  {xs:-19, xc:12.5, yOff:6.5},                 /* AS  sample axis x, clean-air axis x, air path height above hub */
+  liner: {id:19.1, od:21.6, bottomT:1.5, tipL:10, tipOD:4.3, tipBore:2, lockOD:11, lockL:8, engage:7.5},  /* AS  20 mL Luer-lock syringe barrel (PP) */
+  noseS: {len:15, ringT:2, meshT:0.6, membT:0.4, gapBack:0.5},                                    /* AS  sample nostril stack */
+  noseR: {len:22, padT:2.5, bedL:14, carbon_g:1.8, density:0.45},                                 /* AS  cartridge; 1.8 g is FIXED */
+  elbow: {w:16, h:14, luerAd:12, luerAdM:14},                                                     /* AS  elbow block and Luer adapter lengths */
+  fit:   {port:5.6, nutHead:5, nutOD:9, tubeOD:3.175, tubeID:1.5875},      /* port depth DS (Hamilton), nut AS, tube 1/8 x 1/16 in FIXED */
+  ham:   {body:19.1, bore:1.5, dead_mL:0.021, stem:17.5, stemD:6.35},      /* DS body, bore, dead volume. AS stem */
+  med:   {bodyD:12, bodyH:11, portF:17, portM:22, portD:6.4, lockOD:11, bore:3, handleY:8, handleT:6, handleL:14},  /* AS  all stopcock sizes */
+  servo: {L:22.8, W:12.2, caseH:22.7, earL:32.2, earY:16, earT:2.5, shaftOff:5.9, gearSeat:27.5, torque:175},      /* AS  generic MG90S data */
+  gear:  {m:1, teeth:20, t:4, cc:20},                                                             /* AS  1:1 printed gear pair */
+  ch:    {x0:-43, x1:5, zF:16, len:56, wallF:8, wall:6, top:3, pocketH:10.5, gasket:0.8,
+          wShut:26, wCan:36, shoulder:5, rCorner:3},                                              /* AS  chamber block, our design (CNC 6061) */
+  shut:  {L:20, W:22, t:1.7, seat:4.9, pin:5.4, rowGap:17.78, pitch:1.27, zGap:3, sensor:[3,3,0.93]},  /* DS flyer. seat AS */
+  can:   {flD:9.2, bodyD:8.1, h:7.8, flT:0.6, pinD:0.55, pinPCD:5.1, pitch:21, zGap:6.45, oringCS:1.5, cboreD:10.8},  /* DS Figaro. flT, pitch, gland AS */
+  fig:   {L:32, W:20, T:1.6, endOff:9, standoff:6, hole:3, potH:4.9, pins:9, conn:14},            /* AS  until you measure the module */
+  outlet:{d:2, zFromRear:2.5},                                                                    /* AS */
+  rest:  {t:12.7, face:33, y0:4.5, luer:8, hubL:16, needleL:6.35, needleID:0.26},                 /* AS  restrictor block and 25 G tip */
+  buf:   {od:25.4, id:22.2, L:27, plate:3, plateZ:33, barb:8, yc:17.25, vol:13},                /* AS  1 in square tube. 13 mL FIXED */
+  pump:  {headD:27, headL:27.3, motorD:24, bodyL:45.3, nipL:6.1, nipD:4.1, portD:4.5, portL:6, portFromEnd:23.3,
+          tab:3, clear:6, x:50, y:17.5},                                   /* DS drawing. nipD, portL, portFromEnd, tab AS */
+  esp:   {L:63, W:28, t:1.6, x:48, z:-29, seat:8.5, rowGap:25.4, pins:22, modH:3.2},              /* AS  ESP32-S3 dev board */
+  batt:  {L:77, W:21, H:20, x:25, z:40.5, y0:2.5},                                                /* AS  18650 holder */
+  sil:   {id:3, od:5},                                                                            /* AS  silicone tube */
+  bend:  {pfa:20, sil:10}                                                                         /* DEFAULT minimum bend radius */
+};
 
-/* ---------- Dimensions you will want to change once parts are measured (mm) ---------- */
-const FIG = {L:32, W:20, T:1.6,          /* module board: ESTIMATED from the photo */
-             endOff:10, legs:7,          /* can centre from board end, visible leg length: ESTIMATED */
-             flD:9.2, canD:8.1, canH:7.8,/* TO-5 can: Figaro datasheet */
-             x:11, zs:[-24,-46], names:['TGS2603','TGS2602','TGS2620','TGS2600']};
-const AY = 38.6;                         /* air path height, also the nostril axis */
-const NX = 15;                           /* nostril offset from centre */
+/* ---------- Positions that follow from the constants (still mm) ---------- */
+const HT = DIM.hub.top, AY = HT + DIM.axis.yOff, XS = DIM.axis.xs, XC = DIM.axis.xc;
+const LUER_REM = DIM.liner.tipL - DIM.liner.engage;          /* part of a Luer tip that stays outside the socket */
+const CH = (function(){ const c = DIM.ch, zR = c.zF - c.len;
+  return {x0:c.x0, x1:c.x1, zF:c.zF, zR:zR, yB:HT + c.gasket, yC:HT + c.pocketH, yT:HT + c.pocketH + c.top, pF:c.zF - c.wallF, pR:zR + c.wall}; })();
+const SH = (function(){ const s = DIM.shut, zF = CH.pF - s.zGap;
+  return {x:XS, z:zF - s.L/2, zF:zF, zR:zF - s.L, yB:HT + s.seat, yT:HT + s.seat + s.t}; })();
+const CAN = (function(){ const c = DIM.can;
+  return {z:SH.zR - c.zGap - c.bodyD/2, xs:[XS - c.pitch/2, XS + c.pitch/2], yFl:CH.yT, yTip:CH.yT - (c.h - c.flT)}; })();
+const ZSH0 = SH.zR + 2, ZSH1 = ZSH0 - DIM.ch.shoulder;      /* the pocket becomes wider between these z values */
+const OUT = {x:XS, z:CH.pR + DIM.outlet.zFromRear};          /* chamber outlet hole in the hub */
+const FIGY = CH.yT + DIM.can.flT + DIM.fig.standoff;         /* lower face of the Figaro boards */
+const BUF = (function(){ const r = DIM.rest, b = DIM.buf; const x0 = OUT.x + r.t/2;
+  return {bx0:OUT.x - r.t/2, x0:x0, x1:x0 + b.L, xp:x0 + b.L + b.plate, xb:x0 + b.L + b.plate + b.barb, y:b.yc, z:OUT.z}; })();
+const PUMP = (function(){ const p = DIM.pump; const zEnd = OUT.z - p.portFromEnd;     /* head end face */
+  return {x:p.x, y:p.y, zNip:zEnd - p.nipL, zEnd:zEnd, zHead:zEnd + p.headL, zMot:zEnd + p.bodyL, zTab:zEnd + p.bodyL + p.tab,
+          zClear:zEnd + p.bodyL + p.tab + p.clear, portX:p.x - p.headD/2 - p.portL, portZ:OUT.z}; })();
 
-/* Parts: off = fully exploded translation, anc = balloon point in assembled coords */
+/* Valve types. The valve axis z is different because the two valves have different lengths. */
+const VT = (function(){ const m = DIM.med, h = DIM.ham, e = DIM.elbow, s = DIM.servo;
+  const zMed = CH.zF + (e.luerAd - DIM.liner.engage) + m.portM;        /* stopcock locks into a Luer adapter in the chamber port */
+  const bottomZ = zMed + m.portF + LUER_REM;                           /* sample liner bottom, same for the two valve types */
+  const zHam = bottomZ - LUER_REM - e.luerAd - h.body/2;
+  function mk(id, zv, gearY, dir){ return {id:id, zv:zv, gearY:gearY, dir:dir, servoBase:gearY - s.gearSeat, bz:zv + dir*s.shaftOff,
+    cartZ:zv + e.w/2 + e.luerAd + LUER_REM}; }
+  return {bottomZ:bottomZ,
+    med:Object.assign(mk('med', zMed, AY + m.handleY + 2, -1), {name:'Medical stopcock', gapS3:0, gapS2:0}),
+    ham:Object.assign(mk('ham', zHam, AY + h.body/2 + 4, 1), {name:'Hamilton HV 86727', gapS3:zHam - h.body/2 - CH.zF, gapS2:(XC - e.w/2) - (XS + h.body/2)})};
+})();
+const MOUTH_S = VT.bottomZ + DIM.noseS.len;                  /* sample nostril mouth */
+
+/* ---------- Calculated values ---------- */
+function calc(id){
+  const v = VT[id], c = DIM.ch, li = DIM.liner, f = DIM.fit, n = DIM.noseS, s = DIM.shut;
+  const area = (CH.pF - ZSH0)*c.wShut + (ZSH0 - ZSH1)*(c.wShut + c.wCan)/2 + (ZSH1 - CH.pR)*c.wCan - (4 - Math.PI)*c.rCorner*c.rCorner;
+  const gross = area*c.pocketH/1000;
+  const shutV = (s.L*s.W*s.t + 8*s.sensor[0]*s.sensor[1]*s.sensor[2] + 2*11.5*2.2*s.seat)/1000;   /* board, sensors, header and socket rows */
+  const canV = 2*Math.PI*Math.pow(DIM.can.bodyD/2, 2)*(CH.yC - CAN.yTip)/1000;
+  const net = gross - shutV - canV;
+  const aL = Math.PI*li.id*li.id/4, aB = Math.PI*li.tipBore*li.tipBore/4, aT = Math.PI*f.tubeID*f.tubeID/4;
+  const mouth = aL*(n.len - li.bottomT - n.gapBack - n.membT - n.meshT)/1000;      /* open nostril in front of the filter */
+  const back = aL*n.gapBack/1000, tip = aB*li.tipL/1000, port = Math.PI*0.8*0.8*(c.wallF - f.port)/1000;
+  const ham = id === 'ham';
+  const tubeS1 = 0, tubeS3 = ham ? v.gapS3 + 2*f.port : 0, tubeS2 = ham ? v.gapS2 + 2*f.port : 0;
+  const valve = ham ? DIM.ham.dead_mL : Math.PI*DIM.med.bore*DIM.med.bore/4*(DIM.med.portF + DIM.med.portM)/1000;
+  const link = aB*DIM.elbow.luerAd/1000 + aT*tubeS3/1000;
+  const behind = back + tip + valve + link + port;
+  const bed = aL*DIM.noseR.bedL/1000;
+  const silPump = (PUMP.portX + DIM.pump.portL) - BUF.xp, silVent = Math.abs((-DIM.enc.D/2 + DIM.enc.wall) - PUMP.zNip) + DIM.pump.nipL;
+  const q = DIM.flow/60;
+  return {gross:gross, net:net, mouth:mouth, behind:behind, upstream:mouth + behind, valve:valve,
+          tubeS1:tubeS1, tubeS2:tubeS2, tubeS3:tubeS3, tubeUp:tubeS1 + tubeS3, silPump:Math.abs(silPump), silVent:Math.abs(silVent),
+          tChange:net/q, t95:3*net/q, bed:bed, carbon:bed*DIM.noseR.density, tCarbon:bed/q};
+}
+
+/* ---------- Envelopes (axis-aligned boxes) for the clearance check ---------- */
+function envelopes(id){
+  const v = VT[id], E = DIM.enc, L = [], li = DIM.liner, f = DIM.fig, sv = DIM.servo, m = DIM.med, h = DIM.ham, c = DIM.ch;
+  const add = (name, grp, x0, x1, y0, y1, z0, z1) => L.push({name:name, grp:grp, x:[Math.min(x0,x1), Math.max(x0,x1)], y:[Math.min(y0,y1), Math.max(y0,y1)], z:[Math.min(z0,z1), Math.max(z0,z1)]});
+  const hw = E.W/2, hd = E.D/2, w = E.wall;
+  add('Enclosure floor', 'enc', -hw, hw, 0, w, -hd, hd); add('Enclosure top', 'enc', -hw, hw, E.H - w, E.H, -hd, hd);
+  add('Front wall', 'enc', -hw, hw, 0, E.H, hd - w, hd); add('Rear wall', 'enc', -hw, hw, 0, E.H, -hd, -hd + w);
+  add('Left wall', 'enc', -hw, -hw + w, 0, E.H, -hd, hd); add('Right wall', 'enc', hw - w, hw, 0, E.H, -hd, hd);
+  const H = DIM.hub; add('Hub PCB, rear part', 'hub', -H.W/2, H.W/2, HT - H.t, HT, -H.D/2, H.cutZ); add('Hub PCB, front right part', 'hub', H.cutX, H.W/2, HT - H.t, HT, H.cutZ, H.D/2);
+  H.holes.forEach((p, i) => add('Hub standoff ' + (i+1), 'hub', p[0] - 2.6, p[0] + 2.6, w, HT - H.t, p[1] - 2.6, p[1] + 2.6));
+  add('Figaro connectors J10, J11', 'hub', 8, 30, HT, HT + 7, 5, 11); add('ESP32 sockets', 'hub', DIM.esp.x - 14, DIM.esp.x + 14, HT, HT + DIM.esp.seat, DIM.esp.z - 28, DIM.esp.z + 28);
+  add('USB-C and switch', 'hub', 55.5, 65.5, HT, HT + 3.2, 20, 44);
+  /* chamber: walls and top as separate boxes */
+  add('Chamber front wall', 'chamber', c.x0, c.x1, HT, CH.yT, CH.pF, CH.zF); add('Chamber rear wall', 'chamber', c.x0, c.x1, HT, CH.yT, CH.zR, CH.pR);
+  add('Chamber left wall', 'chamber', c.x0, XS - c.wCan/2, HT, CH.yT, CH.pR, CH.pF); add('Chamber right wall', 'chamber', XS + c.wCan/2, c.x1, HT, CH.yT, CH.pR, CH.pF);
+  add('Chamber left wall, shuttle zone', 'chamber', c.x0, XS - c.wShut/2, HT, CH.yT, ZSH0, CH.pF); add('Chamber right wall, shuttle zone', 'chamber', XS + c.wShut/2, c.x1, HT, CH.yT, ZSH0, CH.pF);
+  add('Chamber top wall', 'chamber', c.x0, c.x1, CH.yC, CH.yT, CH.zR, CH.zF);
+  add('Clamp bridge', 'chamber', c.x0, c.x1, FIGY + f.T, FIGY + f.T + 3, CAN.z - 4, CAN.z + 4);
+  add('Clamp bridge leg, left', 'chamber', c.x0, c.x0 + 2.5, CH.yT, FIGY + f.T, CAN.z - 4, CAN.z + 4); add('Clamp bridge leg, right', 'chamber', c.x1 - 2.5, c.x1, CH.yT, FIGY + f.T, CAN.z - 4, CAN.z + 4);
+  const s = DIM.shut; add('BME690 shuttle', 'bme', XS - s.W/2, XS + s.W/2, SH.yB, SH.yT + s.sensor[2], SH.zR, SH.zF);
+  add('Shuttle header row P1', 'bme', XS - s.rowGap/2 - 1.2, XS - s.rowGap/2 + 1.2, HT, SH.yB, SH.z - 5, SH.z + 5); add('Shuttle header row P2', 'bme', XS + s.rowGap/2 - 1.2, XS + s.rowGap/2 + 1.2, HT, SH.yB, SH.z - 6.2, SH.z + 6.2);
+  CAN.xs.forEach((cx, i) => { const r = DIM.can.bodyD/2, n = i + 1;
+    add('Figaro can ' + n, 'fig', cx - r, cx + r, CAN.yTip, CH.yT + DIM.can.flT, CAN.z - r, CAN.z + r);
+    add('Figaro board ' + n, 'fig', cx - f.W/2, cx + f.W/2, FIGY, FIGY + f.T, CAN.z - f.endOff, CAN.z - f.endOff + f.L);
+    add('Figaro trim pot ' + n, 'fig', cx - 3.5, cx + 3.5, FIGY - f.potH, FIGY, CAN.z - f.endOff + 15.5, CAN.z - f.endOff + 22.5);
+    add('Figaro header and plug ' + n, 'fig', cx - 5.1, cx + 5.1, FIGY - 3.3, FIGY, CAN.z - f.endOff + f.L - 2.6, CAN.z - f.endOff + f.L + f.pins + 7); });
+  add('Sample nostril liner', 'noseS', XS - li.od/2, XS + li.od/2, AY - li.od/2, AY + li.od/2, VT.bottomZ, MOUTH_S);
+  add('Sample nostril Luer tip', 'noseS', XS - li.lockOD/2, XS + li.lockOD/2, AY - li.lockOD/2, AY + li.lockOD/2, VT.bottomZ - li.tipL, VT.bottomZ);
+  const e = DIM.elbow;
+  add('Clean-air elbow block', 'noseR', XC - e.w/2, XC + e.w/2, AY - e.h/2, AY + e.h/2, v.zv - e.w/2, v.zv + e.w/2);
+  add('Clean-air Luer joint', 'noseR', XC - li.lockOD/2, XC + li.lockOD/2, AY - li.lockOD/2, AY + li.lockOD/2, v.zv + e.w/2, v.cartZ);
+  add('Clean-air cartridge', 'noseR', XC - li.od/2, XC + li.od/2, AY - li.od/2, AY + li.od/2, v.cartZ, v.cartZ + DIM.noseR.len);
+  if (id === 'ham'){
+    add('Valve body', 'valve', XS - h.body/2, XS + h.body/2, AY - h.body/2, AY + h.body/2, v.zv - h.body/2, v.zv + h.body/2);
+    add('Valve stem', 'valve', XS - h.stemD/2, XS + h.stemD/2, AY + h.body/2, AY + h.stem, v.zv - h.stemD/2, v.zv + h.stemD/2);
+    add('Valve front Luer adapter', 'valve', XS - 4.5, XS + 4.5, AY - 4.5, AY + 4.5, v.zv + h.body/2, v.zv + h.body/2 + e.luerAd);
+    add('Valve rear tube and nuts', 'tubes', XS - 4.5, XS + 4.5, AY - 4.5, AY + 4.5, CH.zF, v.zv - h.body/2);
+    add('Valve side tube and nuts', 'tubes', XS + h.body/2, XC - e.w/2, AY - 4.5, AY + 4.5, v.zv - 4.5, v.zv + 4.5);
+  } else {
+    add('Valve body', 'valve', XS - m.bodyD/2, XS + m.bodyD/2, AY - m.bodyH/2, AY + m.bodyH/2, v.zv - m.bodyD/2, v.zv + m.bodyD/2);
+    add('Valve in-line ports', 'valve', XS - m.lockOD/2, XS + m.lockOD/2, AY - m.lockOD/2, AY + m.lockOD/2, v.zv - m.portM, v.zv + m.portF);
+    add('Valve side port and Luer adapter', 'valve', XS, XC - e.w/2, AY - m.lockOD/2, AY + m.lockOD/2, v.zv - m.lockOD/2, v.zv + m.lockOD/2);
+    add('Valve handle swing', 'valve', XS - 3, XS + m.handleL, AY + m.handleY, AY + m.handleY + m.handleT, v.zv - m.handleL, v.zv + m.handleL);
+    add('Chamber inlet Luer adapter', 'chamber', XS - 4.5, XS + 4.5, AY - 4.5, AY + 4.5, CH.zF, CH.zF + e.luerAd);
+  }
+  const g = DIM.gear, rg = g.m*g.teeth/2 + g.m, xv = XS - g.cc;
+  add('Valve gear', 'servo', XS - rg, XS + rg, v.gearY, v.gearY + g.t, v.zv - rg, v.zv + rg); add('Servo gear', 'servo', xv - rg, xv + rg, v.gearY, v.gearY + g.t, v.zv - rg, v.zv + rg);
+  add('Servo body', 'servo', xv - sv.W/2, xv + sv.W/2, v.servoBase, v.servoBase + sv.caseH, v.bz - sv.L/2, v.bz + sv.L/2);
+  add('Servo ears', 'servo', xv - sv.W/2, xv + sv.W/2, v.servoBase + sv.earY, v.servoBase + sv.earY + sv.earT, v.bz - sv.earL/2, v.bz + sv.earL/2);
+  const p = DIM.esp; add('ESP32-S3 board', 'esp', p.x - p.W/2, p.x + p.W/2, HT + p.seat, HT + p.seat + p.t + p.modH, p.z - p.L/2, p.z + p.L/2);
+  const b = DIM.batt; add('18650 cell and holder', 'batt', b.x - b.L/2, b.x + b.L/2, b.y0, b.y0 + b.H, b.z - b.W/2, b.z + b.W/2);
+  const r = DIM.rest, bu = DIM.buf;
+  add('Restrictor block', 'rest', BUF.bx0, BUF.x0, r.y0, HT - DIM.hub.t, OUT.z - r.face/2, OUT.z + r.face/2);
+  add('Buffer', 'rest', BUF.x0, BUF.xp, bu.yc - bu.od/2, bu.yc + bu.od/2, OUT.z - bu.plateZ/2, OUT.z + bu.plateZ/2);
+  add('Buffer barb', 'rest', BUF.xp, BUF.xb, bu.yc - 2.5, bu.yc + 2.5, OUT.z - 2.5, OUT.z + 2.5);
+  const pu = DIM.pump; add('Pump body', 'pump', PUMP.x - pu.headD/2, PUMP.x + pu.headD/2, PUMP.y - pu.headD/2, PUMP.y + pu.headD/2, PUMP.zEnd, PUMP.zMot);
+  add('Pump end nipple', 'pump', PUMP.x - pu.nipD/2, PUMP.x + pu.nipD/2, PUMP.y - pu.nipD/2, PUMP.y + pu.nipD/2, PUMP.zNip, PUMP.zEnd);
+  add('Pump side port', 'pump', PUMP.portX, PUMP.x - pu.headD/2, PUMP.y - pu.portD/2, PUMP.y + pu.portD/2, OUT.z - pu.portD/2, OUT.z + pu.portD/2);
+  add('Pump tabs and wire space', 'pump', PUMP.x - 6, PUMP.x + 6, PUMP.y - 6, PUMP.y + 6, PUMP.zMot, PUMP.zClear);
+  return L;
+}
+/* Pairs that touch on purpose. Each entry is two name fragments. */
+const TOUCH = [['Enclosure','Enclosure'],['wall','Enclosure'],['wall','wall'],['Hub standoff','Hub PCB'],['Hub standoff','Enclosure floor'],['Hub PCB','Hub PCB'],
+  ['Figaro connectors','Hub PCB'],['ESP32 sockets','Hub PCB'],['USB-C','Hub PCB'],['USB-C','Right wall'],['Chamber','Chamber'],['Chamber','Hub PCB'],['Clamp bridge','Chamber'],['Clamp bridge','Clamp bridge'],
+  ['Clamp bridge','Figaro board'],['Shuttle header','Hub PCB'],['Shuttle header','BME690 shuttle'],['Figaro can','Chamber top'],['Figaro can','Figaro board'],['Figaro can','Figaro trim'],
+  ['Figaro board','Figaro trim'],['Figaro board','Figaro header'],['Figaro trim','Figaro header'],['Sample nostril','Sample nostril'],['Sample nostril','Front wall'],['Clean-air','Clean-air'],['Clean-air cartridge','Front wall'],['Clean-air Luer','Front wall'],
+  ['Valve','Valve'],['Valve','Sample nostril Luer'],['Valve rear tube','Chamber front'],['Valve side','Clean-air elbow'],['Valve rear tube','Valve'],['Valve side tube','Valve'],
+  ['Chamber inlet Luer','Valve'],['Chamber inlet Luer','Chamber front'],['Valve gear','Servo gear'],['Valve gear','Valve'],['Servo gear','Servo body'],['Servo body','Servo ears'],
+  ['ESP32-S3 board','ESP32 sockets'],['ESP32-S3 board','Rear wall'],['Restrictor block','Hub PCB'],['Restrictor block','Buffer'],['Buffer','Buffer'],['Buffer barb','Pump side port'],['Pump','Pump'],['Valve rear tube','Chamber top'],['Restrictor block','Chamber'],['18650','Enclosure floor'],['Pump end nipple','Rear wall']];
+function clearance(id, limit){
+  const L = envelopes(id), out = [], lim = limit === undefined ? 2 : limit;
+  const touch = (a, b) => TOUCH.some(t => (a.indexOf(t[0]) >= 0 && b.indexOf(t[1]) >= 0) || (b.indexOf(t[0]) >= 0 && a.indexOf(t[1]) >= 0));
+  for (let i = 0; i < L.length; i++) for (let j = i + 1; j < L.length; j++){
+    const a = L[i], b = L[j]; if (touch(a.name, b.name)) continue;
+    const g = ['x','y','z'].map(k => Math.max(a[k][0] - b[k][1], b[k][0] - a[k][1]));
+    const pos = g.filter(d => d > 0);
+    if (!pos.length){ out.push({a:a.name, b:b.name, gap:-Math.min.apply(null, g.map(d => -d)), hit:true}); continue; }
+    const d = Math.sqrt(pos.reduce((s, d) => s + d*d, 0)); if (d < lim - 1e-9) out.push({a:a.name, b:b.name, gap:d, hit:false});
+  }
+  return out.sort((p, q) => p.gap - q.gap);
+}
+
+/* ---------- Parts. off = fully exploded translation, anc = balloon point in assembled coords ---------- */
+const NC = (XS + XC)/2;
 const PARTS = [
-  {id:'lid', n:1, name:'Top shell', qty:'1', size:'136 × 130 × 27', src:'as', off:[0,172,0], anc:[-44,63,30],
-   text:'Charcoal PETG cover that lifts straight off. Every part mounts to the tray, so you can reach the chamber without unplugging anything. The rear slot clears the ESP32 USB port.'},
-  {id:'tray', n:2, name:'Bottom tray', qty:'1', size:'136 × 130 × 36', src:'as', off:[0,-96,0], anc:[-54,6,65],
-   text:'Light PETG base with brass hub standoffs, rubber feet, a foam saddle for the pump, and exhaust slots in the rear wall. The front window takes the nose assembly.'},
-  {id:'shroud', n:3, name:'Nose shroud', qty:'1', size:'68 × 32 × 28', src:'as', off:[0,0,126], anc:[0,50,74],
-   text:'Printed nose that bolts over the front window and locates both nostrils. It is cosmetic and carries no air, so you can restyle it without touching the air path.'},
-  {id:'noseS', n:4, name:'Sample nostril', qty:'1', size:'Ø24.4 × 46', src:'as', off:[0,0,80], anc:[-15,50,62],
-   text:'A cone narrows from 22 mm to 14 mm so a vial, swab or food sample can sit against it without much room air mixing in. Behind the cone is a steel mesh and a PTFE membrane disc for dust. There is no adsorbent here, because anything added would strip the odor.'},
-  {id:'noseR', n:5, name:'Clean-air nostril', qty:'1', size:'Ø24.4 × 46', src:'as', off:[0,0,80], anc:[15,50,62],
-   text:'Same cone, packed from front to back with a particle pad, about 1.8 g of granular activated carbon, and a retainer pad that stops carbon dust reaching the sensors. It screws out for replacement. Avoid silica gel or other desiccants here: dry reference air would swing the MOX baseline.'},
-  {id:'valve', n:6, name:'3-way stopcock', qty:'1', size:'Ø12 body, Luer ports', src:'as', off:[0,26,46], anc:[0,46,28],
-   text:'A sealed T-bore plug selects a nostril. The closed nostril also stops breathing through the carbon, which extends the filter’s life. Halfway between the two positions it blocks the chamber port, giving the Hold state. Medical Luer stopcocks are cheap and fit standard Luer tubing. Move to a PTFE lab stopcock if you see odor carryover.'},
-  {id:'servo', n:7, name:'MG90S servo', qty:'1', size:'22.8 × 12.2 × 29', src:'as', off:[0,-42,66], anc:[8,20,40],
-   text:'Sits below the hub and turns the stopcock through a coupler. It travels 180° from clean air to sample, and the chamber port closes at the midpoint, so one nostril is fully shut before the other opens. The hub cuts servo power once it arrives, which removes its noise and heat during measurement.'},
-  {id:'chamber', n:8, name:'Sensor chamber', qty:'1', size:'40 × 76 × 13', src:'as', off:[0,60,0], anc:[-19,47,4],
-   text:'A flow cell that seals to the hub with a gasket, with about 20 mL of air space. Air enters at the front, crosses the BME690s, passes the four Figaro cans, and leaves through a port in the hub. Mill it from aluminum if you can get shop time. Otherwise use epoxy-coated PETG, because bare prints absorb and release odor.'},
-  {id:'bme', n:9, name:'BME690 8× shuttle board', qty:'1', size:'20 × 22 × 1.7', src:'ds', off:[0,27,0], anc:[0,41,10],
-   text:'Eight BME690 sensors at the upstream end of the chamber. The two 1.27 mm headers plug straight into socket J1 on the hub. They also report temperature, humidity and chamber pressure, which gives you a free check for a clogged filter or a leak.'},
-  {id:'fig', n:10, name:'Figaro modules', qty:'4', size:'≈ 32 × 20 board, can Ø9.2 × 7.8', src:'es', off:[0,108,0], anc:[-30,56,-24],
-   text:'The AliExpress breakout boards, mounted upside down on the lid with each can sealed on an O-ring. Each module sends VCC, GND and AOUT to the hub. The comparator output (DOUT) is unused. Four modules and the 2603, 2602, 2620 and 2600 mix are my assumption, and the layout adds a row easily.'},
-  {id:'hub', n:11, name:'Hub PCB', qty:'1', size:'128 × 122 × 1.6', src:'as', off:[0,0,0], anc:[-55,34,50],
-   text:'Everything terminates here. It also forms the chamber floor. It carries the shuttle socket, Figaro connectors, ADS1115, battery charger and protection, heater boost converter, sensor LDO, pump MOSFET and servo load switch. The pump, servo and battery connectors are on the underside, and a notch at the front clears the nostrils. An unpopulated ENS160 footprint is reserved inside the chamber.'},
-  {id:'esp', n:12, name:'ESP32 devkit', qty:'1', size:'51 × 25.5 board', src:'pt', off:[0,46,0], anc:[50,47,-20],
-   text:'ESP32-WROOM-32D module (18 × 25.5 × 3.1 mm, from its datasheet) on a devkit, stacked into headers on the hub outside the chamber. The USB port faces the rear wall, and the antenna end faces forward, away from the pump and battery.'},
-  {id:'batt', n:13, name:'18650 cell + holder', qty:'1', size:'77 × 21 × 20', src:'as', off:[0,-54,26], anc:[-30,23,-11],
-   text:'Replaces the 1000 mAh pouch from Rev A. Four heaters add about a watt, so that pouch would last only 1.5 hours. A protected 3400 mAh cell gives about 5 hours. SDP rules require protection circuitry on lithium cells, so use a protected cell or add protection on the hub.'},
-  {id:'rest', n:14, name:'Flow restrictor + buffer', qty:'1', size:'25 G tip, 38 × 22 × 24 buffer', src:'as', off:[-118,-22,-6], anc:[-41,28,-43],
-   text:'A 25 G dispensing tip sets the flow and isolates the chamber from the pump. The sealed 13 mL buffer behind it smooths the pump’s pulses. Tips are cheap and push-fit, so you can tune flow by swapping gauge or length. A 23 G tip passes more air for the same pump vacuum.'},
-  {id:'pump', n:15, name:'ZR320-02PM vacuum pump', qty:'1', size:'Ø27 × 45.3', src:'ds', off:[126,-26,38], anc:[38,31,-44],
-   text:'Adafruit 4700. The side inlet connects to the buffer and the end outlet vents through the rear wall. It runs from the battery with PWM and rests on foam so vibration stays off the hub. Adafruit recommends about a 50% duty cycle, so run it only during a sniff cycle and rest it between cycles.'},
-  {id:'tubes', n:16, name:'Air tubing', qty:'1 set', size:'3 mm ID', src:'as', off:[0,0,0], anc:[-12,AY,33],
-   text:'Use FEP or PTFE tube on the sensor side of the chamber, because silicone absorbs odor and releases it later. Silicone tube is fine after the chamber. Keep the runs short and the same length on both sides.'},
-  {id:'wires', n:17, name:'Wiring harness', qty:'1 set', size:'22–26 AWG', src:'as', off:[0,0,0], anc:[-44,44,-46],
-   text:'Three wires from each Figaro module, two from the pump, three from the servo and two from the battery. Everything meets at the hub. Route the pump leads away from the Figaro signal wires.'}
+  {id:'lid', n:1, name:'Top shell', qty:'1', size:'136 × 130 × 27', mat:'PETG or ASA print', src:'as', off:[0,172,0], anc:[-44,63,30],
+   text:'Printed cover that lifts straight off. All parts stay on the tray. Vent slots are above the Figaro modules and in the right wall near the ESP32-S3. They are more than 35 mm from the nostrils and the exhaust. The rear slot is for the ESP32-S3 USB port.'},
+  {id:'tray', n:2, name:'Bottom tray', qty:'1', size:'136 × 130 × 36', mat:'PETG or ASA print', src:'as', off:[0,-96,0], anc:[-54,6,65],
+   text:'Printed base with five brass hub standoffs, rubber feet, the pump cradle and the servo bracket. The exhaust vent is in the rear wall, opposite the nostrils. The USB-C charge port and the power switch are in the right wall.'},
+  {id:'shroud', n:3, name:'Nose shroud', qty:'1', size:'72 × 32 × 18', mat:'PETG or ASA print', src:'as', off:[0,0,126], anc:[NC,52,72],
+   text:'Printed nose that bolts on the front window. It holds the two nostril liners but carries no air. The sample air touches only the liner, not the print.'},
+  {id:'noseS', n:4, name:'Sample nostril', qty:'1', size:'Ø21.6 × 15 liner, Luer-lock tip', mat:'PP syringe barrel, steel mesh, PTFE membrane', src:'as', off:[0,0,80], anc:[XS,52,70],
+   text:'A cut 20 mL Luer-lock syringe barrel is the wetted liner. The liner mouth replaces the printed cone of Rev B, because printed plastic is not permitted on wetted surfaces. A steel mesh and a PTFE membrane disc are at the bottom, held by a ring. The Luer tip locks directly into the valve, so there is no tube here.'},
+  {id:'noseR', n:5, name:'Clean-air cartridge + elbow block', qty:'1', size:'Ø21.6 × 22 cartridge, 16 × 14 × 16 block', mat:'PP syringe barrel, carbon, pads; block 6061', src:'as', off:[0,0,80], anc:[XC,52,74],
+   text:'A cut 20 mL Luer-lock syringe barrel holds a particle pad, about 1.8 g of activated carbon and a retainer pad. Turn the barrel to release the Luer lock and pull it out from the front. No desiccant. The aluminum elbow block stays in the case and turns the air 90° to the valve side port. You can make the block with a drill press and a 1/4-28 tap.'},
+  {id:'valve', n:6, name:'3-way valve', qty:'1', size:'see valve type', mat:'see valve type', src:'as', off:[0,30,46], anc:[XS,47,42],
+   text:''},
+  {id:'servo', n:7, name:'MG90S servo + gear pair', qty:'1', size:'22.8 × 12.2 × 31, gears m1 20T', mat:'Servo; gears and bracket PETG print', src:'as', off:[-52,0,46], anc:[XS - 20,48,42],
+   text:'The servo is beside the valve and turns it through a 1:1 printed gear pair on top. A servo directly below the valve does not fit in 63 mm. Positions: Hold, Sample and Clean air are 90° apart. Printed hard stops are 5° after each end position, so the servo does not stall on them. The hub removes servo power after each move. Servo torque is about 175 mNm against a maximum of 106 mNm for the Hamilton valve.'},
+  {id:'chamber', n:8, name:'Sensor chamber block', qty:'1', size:'48 × 56 × 12.7, net ≈ 12 mL', mat:'6061 CNC; FKM gasket and O-rings; PETG clamp bridge', src:'as', off:[0,60,0], anc:[-40,47,12],
+   text:'One machined 6061 block, open at the bottom. A 1 mm FKM gasket seals it to the hub. The hub area inside the gasket is ENIG copper with no solder mask. Air enters the front wall at the level of the shuttle top face, flows above and below the shuttle, passes the two cans side by side, and goes out through a hole in the hub behind the cans. Each can seals with an FKM O-ring in a counterbore. One clamp bridge holds the two modules. The shuttle is fully inside, so no pin goes through a wall.'},
+  {id:'bme', n:9, name:'BME690 8× shuttle board', qty:'1', size:'20 × 22 × 1.7', mat:'FR4, 8 × BME690', src:'ds', off:[0,27,0], anc:[XS,41,SH.z],
+   text:'Eight BME690 sensors at the upstream end of the chamber. The two 1.27 mm header rows are parallel to the flow, so air also flows below the board. The board plugs into sockets J1 on the hub. Remove the six chamber screws and lift the block to get access.'},
+  {id:'fig', n:10, name:'Figaro modules', qty:'2', size:'≈ 32 × 20 board, can Ø9.2 flange × 7.8', mat:'FR4 module, TO-5 can', src:'as', off:[0,108,0], anc:[CAN.xs[0],56,-8],
+   text:'Two modules, upside down on the chamber top. Module 1 is TGS2600 (the photo shows 2600 on the can). Module 2 is "TGS26xx, unknown" until you read its can. Only the can goes into the chamber. The board, legs and header stay outside, and the header points to the front so that you can reach it. Each module sends VCC, GND and AOUT to the hub. AOUT goes through a 2:1 divider to ADS1115 A0 and A1. Can size is DATASHEET. Board size, hole size and can standoff are ASSUMED.'},
+  {id:'hub', n:11, name:'Hub PCB', qty:'1', size:'127 × 121 × 1.6, front-left cut-out', mat:'FR4, ENIG', src:'as', off:[0,0,0], anc:[50,34,30],
+   text:'All wiring ends here. It is also the chamber floor inside the gasket line. It carries the shuttle sockets, Figaro connectors, ADS1115, charger and protection, 5 V boost converter, sensor LDO, pump MOSFET Q1 and servo load switch Q2. The boost converter and the ESP32-S3 are on the right, away from the BME690 and the battery. Turn on Hub wiring to see the nets and the GPIO numbers.'},
+  {id:'esp', n:12, name:'ESP32-S3 dev board', qty:'1', size:'63 × 28 board', mat:'Module on dev board', src:'as', off:[0,46,0], anc:[DIM.esp.x,47,-20],
+   text:'ESP32-S3 dev board on sockets, with the USB port at the rear wall. Board size is ASSUMED. The pin map treats the board as an octal-PSRAM (R8) type, so GPIO33 to GPIO37 are not used.'},
+  {id:'batt', n:13, name:'18650 cell + holder', qty:'1', size:'77 × 21 × 20', mat:'Li-ion cell, protected', src:'as', off:[0,-54,30], anc:[30,23,40],
+   text:'Front right, below the hub. It is more than 50 mm from the cans, the boost converter and the ESP32-S3. Two Figaro heaters use about 0.5 W. Use a protected cell or add protection on the hub.'},
+  {id:'rest', n:14, name:'Restrictor block + buffer', qty:'1', size:'25 G tip, 12.7 block, 27 of 1 in square tube', mat:'6061 block and tube, FKM gaskets, PP tip', src:'as', off:[-70,-40,0], anc:[0,22,OUT.z],
+   text:'The restrictor block seals to the hub underside with an FKM O-ring, below the chamber outlet hole. So the chamber outlet has no tube. The 25 G 1/4 in tip locks on a male Luer inside the buffer. All joints at −13 kPa are threaded joints or gaskets. The buffer is 27 mm of 1 in square aluminum tube, about 13 mL. To change the tip, remove the four buffer screws. You can also adjust the flow with pump PWM.'},
+  {id:'pump', n:15, name:'ZR320-02PM vacuum pump', qty:'1', size:'Ø27 × 51.4 with nipple', mat:'Pump; TPU saddles', src:'ds', off:[90,-30,0], anc:[PUMP.x,31,-40],
+   text:'4.5 V version. Use range 3.0 to 4.5 V, free flow ≥ 1.8 L/min, maximum vacuum ≤ −55 kPa, < 60 dB. It runs from the 18650 with PWM through Q1. Side port = inlet and end nipple = outlet are ASSUMED. The drawing shows 45.3 without the nipple, so the model uses 51.4 overall. The space behind the solder tabs is 6 mm. The pump sits on TPU saddles because the bay is only 29.5 mm high.'},
+  {id:'tubes', n:16, name:'Air tubing and fittings', qty:'1 set', size:'PFA 1/8 × 1/16 in; silicone 3 × 5', mat:'PFA, silicone, ETFE nuts, Luer adapters', src:'as', off:[0,0,0], anc:[20,17,OUT.z],
+   text:'Blue = PFA, upstream of the chamber. Cream = silicone, only from the buffer to the pump and from the pump to the vent. All upstream tubes are straight, so the 20 mm bend radius rule has no effect. PFA joints use 1/4-28 flangeless nuts and ferrules. Silicone joints use spring clamps.'},
+  {id:'wires', n:17, name:'Wiring harness', qty:'1 set', size:'22–26 AWG', mat:'PVC wire', src:'as', off:[0,0,0], anc:[-44,44,-46],
+   text:'Three wires from each Figaro module, two from the pump, three from the servo and two from the battery. Keep the pump wires away from the Figaro signal wires.'}
 ];
 const byId = {}; PARTS.forEach(p => byId[p.id] = p);
-const SRC = {ds:'Datasheet', as:'Assumed', pt:'Partial', es:'Estimated'};
+const VTINFO = {
+  med:{name:'3-way valve: medical stopcock', size:'Ø12 body, Luer ports, ≈ 39 in line', mat:'PC body, HDPE plug (wetted)', src:'as',
+       text:'Standard medical 3-way Luer stopcock with a T-bore plug. The sample nostril and the chamber are on the in-line ports, so the sample path is straight. The clean-air side is on the side port. All Luer joints are direct, so this valve type has no upstream tube. Cut the lever to 14 mm so that it clears the nostril. All sizes are ASSUMED until you measure the part.'},
+  ham:{name:'3-way valve: Hamilton HV 86727', size:'19.1 body, 1.5 bore, 1/4-28 ports', mat:'PTFE/CTFE wetted, aluminum housing', src:'ds',
+       text:'Hamilton HV plug valve with the T flow path (model 3-3). Part 86728 has the 90° flow path and cannot make the straight path from front to rear. Dead volume is 21 µL. Breakaway torque is 0.07 to 0.11 Nm. The front port has a Luer adapter for the nostril. The rear and side ports use short PFA tubes with flangeless nuts. Stem size is ASSUMED.'}
+};
 
-const SENS = [[-6,-4.6],[0,-4.6],[6,-4.6],[-6,.6],[0,.6],[6,.6],[0,5.8],[6,5.8]];
-const HOLES = [[-60,-57],[60,-57],[-60,57],[60,57]];
-const HT = 33.6;              /* hub top surface */
-const ESPX = 50, ESPZ = -34.5;
+/* ---------- BOM: ref, part id, name, qty, key dimensions, material, tag ---------- */
+function bomRows(){
+  const a = calc('ham'), f1 = x => x.toFixed(1);
+  return [
+  ['1','lid','Top shell','1','136 × 130 × 27, wall 2.5','PETG or ASA','as'],
+  ['2','tray','Bottom tray','1','136 × 130 × 36, wall 2.5','PETG or ASA','as'],
+  ['3','shroud','Nose shroud','1','72 × 32 × 18','PETG or ASA','as'],
+  ['4','noseS','Sample nostril liner','1','20 mL Luer-lock barrel, ID 19.1, cut to 15','Polypropylene','as'],
+  ['4a','noseS','Steel mesh disc','1','Ø19 × 0.6','Stainless steel','as'],
+  ['4b','noseS','PTFE membrane disc','1','Ø19 × 0.4, pore 5 to 10 µm','PTFE','as'],
+  ['5','noseR','Clean-air cartridge','1','20 mL Luer-lock barrel, cut to 22; carbon bed Ø19.1 × 14','PP, activated carbon 1.8 g, 2 pads','as'],
+  ['5a','noseR','Elbow block','1','16 × 14 × 16, two 1/4-28 ports at 90°','Aluminum 6061','as'],
+  ['6','valve','Valve v1: medical 3-way stopcock','1','Ø12 body, ≈ 39 in line, T-bore','PC body, HDPE plug','as'],
+  ['6a','valve','Valve alternate: Hamilton HV 86727','1','19.1 body, 1.5 bore, 1/4-28 ports, 21 µL','PTFE/CTFE, aluminum housing','ds'],
+  ['7','servo','MG90S servo','1','22.8 × 12.2 × 31','—','as'],
+  ['7a','servo','Gear pair and bracket','1','module 1, 20 teeth, 20 centre distance','PETG print','as'],
+  ['8','chamber','Chamber block','1','48 × 56 × 12.7, pocket 9.7 deep, net ' + f1(a.net) + ' mL','Aluminum 6061, CNC','as'],
+  ['8a','chamber','Chamber gasket','1','48 × 56 × 1.0, cut to the block','FKM sheet','as'],
+  ['8b','chamber','Can O-ring','2','8 × 1.5','FKM','as'],
+  ['8c','chamber','Clamp bridge','1','48 × 8 × 3 with two legs','PETG print','as'],
+  ['9','bme','BME690 8× shuttle board 3.0','1','20 × 22 × 1.7, pins 5.4','FR4','ds'],
+  ['10','fig','Figaro module, TGS2600','1','board ≈ 32 × 20 × 1.6; can Ø9.2 × 7.8','FR4, TO-5 can','as'],
+  ['10a','fig','Figaro module, TGS26xx, unknown','1','board ≈ 32 × 20 × 1.6; can Ø9.2 × 7.8','FR4, TO-5 can','as'],
+  ['11','hub','Hub PCB','1','127 × 121 × 1.6','FR4, ENIG','as'],
+  ['12','esp','ESP32-S3 dev board','1','63 × 28','—','as'],
+  ['13','batt','18650 cell and holder','1','77 × 21 × 20','Li-ion, protected','as'],
+  ['14','rest','Restrictor block','1','12.7 × 27.5 × 33','Aluminum 6061','as'],
+  ['14a','rest','Dispensing tip, 25 G × 1/4 in','1','needle ID 0.26 × 6.35, hub ≈ 16','Steel, PP hub','as'],
+  ['14b','rest','Buffer','1','1 in square tube × 27, 13 mL; end plate 25.4 × 33 × 3','Aluminum 6061, FKM gaskets','as'],
+  ['15','pump','ZR320-02PM pump, 4.5 V','1','head Ø27 × 27.3, motor Ø24, 51.4 with nipple','—','ds'],
+  ['16','tubes','PFA tube, valve to chamber (Hamilton only)','1','1/8 × 1/16 in, ' + f1(a.tubeS3) + ' long','PFA','as'],
+  ['16a','tubes','PFA tube, elbow block to valve (Hamilton only)','1','1/8 × 1/16 in, ' + f1(a.tubeS2) + ' long','PFA','as'],
+  ['16b','tubes','Silicone tube, buffer to pump','1','3 × 5, ' + f1(a.silPump) + ' long','Silicone','as'],
+  ['16c','tubes','Silicone tube, pump to vent','1','3 × 5, ' + f1(a.silVent) + ' long','Silicone','as'],
+  ['16d','tubes','Flangeless nut and ferrule, 1/4-28','4','for 1/8 in tube, head 5','ETFE or PEEK','as'],
+  ['16e','tubes','Luer adapters, 1/4-28 thread','3 to 4','female Luer × 3, male Luer × 1 (stopcock)','PP or ETFE','as'],
+  ['17','wires','Wiring harness','1 set','22–26 AWG','—','as']];
+}
 
-/* Valve: angle of the T-bore. The solid side points at the blocked port. */
+/* ---------- ESP32-S3 pin map ---------- */
+const PINS = [
+  ['BME690 SCK','GPIO12','SPI2 IO MUX pin (FSPICLK). Shuttle P2-2'],
+  ['BME690 MOSI (SDI)','GPIO11','SPI2 IO MUX pin (FSPID). Shuttle P2-4'],
+  ['BME690 MISO (SDO)','GPIO13','SPI2 IO MUX pin (FSPIQ). Shuttle P2-3'],
+  ['BME690 CS0–CS3','GPIO4, 5, 6, 7','U1–U4, shuttle P1-4 to P1-7. 10 kΩ pull-ups'],
+  ['BME690 CS4–CS7','GPIO15, 16, 17, 18','U5–U8, shuttle P2-5 to P2-8. 10 kΩ pull-ups'],
+  ['ADS1115 SDA / SCL','GPIO8 / GPIO9','I²C'],
+  ['Battery sense','GPIO1','ADC1_CH0, through a divider'],
+  ['Pump PWM (Q1)','GPIO21','No power-up glitch in the datasheet table. Gate pull-down'],
+  ['Servo signal','GPIO14',''],
+  ['Servo load switch (Q2)','GPIO10','High = on'],
+  ['Shuttle EEPROM, optional','GPIO47','1-Wire, 4.7 kΩ pull-up. 1.8 V on R16V chips'],
+  ['Spare','GPIO2, 38, 48','GPIO2 is ADC1. GPIO38 or 48 can be the on-board RGB LED']
+];
+
+const CHANGELOG = [
+  'Layout: the sample nostril, the valve and the chamber inlet are on one straight line. The clean-air cartridge is parallel to it.',
+  'Chamber: one CNC 6061 block, open at the bottom, on an FKM gasket. The shuttle is fully inside. The net volume is about 12 mL (was 20 mL).',
+  'Chamber outlet: a hole in the hub. The restrictor block is below it. The 25 G tip is inside the 13 mL buffer.',
+  'Figaro modules: 2 (was 4), side by side at the downstream end. One clamp bridge and O-rings on the can bodies. ADS1115 uses A0 and A1.',
+  'Nostrils: polypropylene syringe-barrel liners with Luer-lock tips (were printed barrels). The carbon cartridge comes out from the front.',
+  'Valve: T-plug in line. Medical stopcock or Hamilton HV 86727, with a toggle. Positions are Hold, Sample, Clean air at 90° steps.',
+  'Servo: beside the valve with a 1:1 gear pair (was below the valve).',
+  'Pump: moved to the right rear. Overall length 51.4 with the nipple. A short silicone tube connects it to the buffer.',
+  'Host: ESP32-S3 dev board with a new pin map (the Rev B pin map is not valid on the S3).',
+  'Tubing: PFA upstream, silicone only after the buffer. Tubes have a color for each material.',
+  'Viewer: valve-type toggle, section view, airflow arrows on the tube paths, source tags, material in the part info, full BOM.',
+  'Removed: two Figaro modules and their wiring, the ENS160 footprint, the classic ESP32 devkit.'
+];
+
+/* Valve angle = direction of the closed port. 0 = clean-air side (+x), +90° = chamber, −90° = sample nostril. */
 const VALVE = {
-  ref:{a: Math.PI/2, name:'Clean air', title:'Clean air', air:'ref',
-    flow:['Clean-air nostril','Carbon filter','Valve','Chamber','Restrictor','Buffer','Pump','Rear vent'],
-    text:'Air passes through the carbon first, so the sensors settle on a clean reference. This is the state used for the baseline and for the purge after a sample.'},
-  hold:{a:0, name:'Hold', title:'Hold', air:'hold',
+  ref:{a:-Math.PI/2, name:'Clean air', title:'Clean air', air:'ref',
+    flow:['Clean-air cartridge','Carbon','Elbow block','Valve','Chamber','Restrictor','Buffer','Pump','Rear vent'],
+    text:'The plug closes the sample port. Air goes through the carbon first, so the sensors get a clean reference. Use this state for the baseline and for the purge.'},
+  hold:{a:Math.PI/2, name:'Hold', title:'Hold', air:'hold',
     flow:['Valve closed','Pump off','Chamber sealed'],
-    text:'The valve blocks the chamber port and the pump stops, so sensors read a trapped sample in still air with no flow cooling. Run the pump in this position to pull a vacuum, and the BME690 pressure reading becomes a leak test.'},
-  samp:{a:-Math.PI/2, name:'Sample', title:'Sample', air:'samp',
-    flow:['Sample nostril','Dust filter','Valve','Chamber','Restrictor','Buffer','Pump','Rear vent'],
-    text:'Air enters through the open cone and reaches the sensors with only a dust filter in the way. The flow is the same as the clean-air state, so the sensors respond to the odor and not to a change in flow.'}
+    text:'The plug closes the chamber port and the pump stops. The sensors read a trapped sample in still air. With a T-plug, the two nostrils are connected to each other in this state, which has no effect. For a leak test, run the pump in this state and monitor the BME690 pressure.'},
+  samp:{a:0, name:'Sample', title:'Sample', air:'samp',
+    flow:['Sample nostril','Mesh and membrane','Valve','Chamber','Restrictor','Buffer','Pump','Rear vent'],
+    text:'The plug closes the clean-air port. The sample goes straight through the valve to the chamber. From Sample to Hold is one 90° step. From Hold to Purge the plug goes through Sample, so start the pump after the valve stops.'}
 };
 const PHASES = [{v:'ref',label:'Baseline',s:30},{v:'samp',label:'Sample',s:30},{v:'hold',label:'Hold',s:15},{v:'ref',label:'Purge',s:60}];
+/*</DATA>*/
+
+const $ = id => document.getElementById(id);
+const SRC = TAG;
+const SENS = [[-6,-4.6],[0,-4.6],[6,-4.6],[-6,.6],[0,.6],[6,.6],[0,5.8],[6,5.8]];
+const HOLES = DIM.hub.holes;
+/* chamber pocket outline in world x, z */
+const POCKET = (function(){ const a = DIM.ch.wShut/2, b = DIM.ch.wCan/2;
+  return [[XS-a,CH.pF],[XS+a,CH.pF],[XS+a,ZSH0],[XS+b,ZSH1],[XS+b,CH.pR],[XS-b,CH.pR],[XS-b,ZSH1],[XS-a,ZSH0]]; })();
+/* ESP32-S3-DevKitC-1 header order, antenna end first. J1 is the +x row. */
+const ESPJ1 = ['3V3','3V3','RST',4,5,6,7,15,16,17,18,8,3,46,9,10,11,12,13,14,'5V','GND'];
+const ESPJ3 = ['GND',43,44,1,2,42,41,40,39,38,37,36,35,0,45,48,47,21,20,19,'GND','GND'];
+function espPin(gpio){ const e = DIM.esp; let side = 1, i = ESPJ1.indexOf(gpio); if (i < 0){ side = -1; i = ESPJ3.indexOf(gpio); }
+  return [e.x + side*e.rowGap/2, e.z + (e.pins-1)/2*2.54 - i*2.54, side]; }
+const NETS = {12:'SCK', 11:'MOSI', 13:'MISO', 4:'CS0', 5:'CS1', 6:'CS2', 7:'CS3', 15:'CS4', 16:'CS5', 17:'CS6', 18:'CS7', 8:'SDA', 9:'SCL', 1:'VBAT SENSE', 21:'PUMP PWM', 14:'SERVO SIG', 10:'SERVO PWR', 47:'1-WIRE'};
 
 const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const state = {e: reduce ? .75 : 0, eT: .75, see:false, air:false, wire:false, balls:true, spin:false, sel:null, valve:'ref', va:VALVE.ref.a, cycle:-1, cycleT:0};
+const state = {e: reduce ? .75 : 0, eT: .75, see:false, air:false, wire:false, sec:false, balls:true, spin:false, sel:null, valve:'ref', vt:'med', va:VALVE.ref.a, cycle:-1, cycleT:0};
 
 /* ---------- canvas drawings (units: mm) ---------- */
 const FD = '"Barlow Condensed","Arial Narrow",sans-serif', FM = '"IBM Plex Mono",monospace';
-function rrPath(g, x, y, w, h, r){ g.beginPath(); g.moveTo(x+r,y); g.lineTo(x+w-r,y); g.quadraticCurveTo(x+w,y,x+w,y+r); g.lineTo(x+w,y+h-r); g.quadraticCurveTo(x+w,y+h,x+w-r,y+h); g.lineTo(x+r,y+h); g.quadraticCurveTo(x,y+h,x,y+h-r); g.lineTo(x,y+r); g.quadraticCurveTo(x,y,x+r,y); g.closePath(); }
 
 function drawHub(g){
-  g.translate(64, 61);
-  g.fillStyle = '#1c5a3c'; g.fillRect(-64,-61,128,122);
+  const W = DIM.hub.W, D = DIM.hub.D, e = DIM.esp;
+  g.translate(W/2, D/2);
+  g.fillStyle = '#1c5a3c'; g.fillRect(-W/2,-D/2,W,D);
   g.lineCap = 'round'; g.lineJoin = 'round';
   const line = (pts, w, c) => { g.strokeStyle = c; g.lineWidth = w; g.beginPath(); g.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) g.lineTo(pts[i][0], pts[i][1]); g.stroke(); };
-  const TR = '#2b7752', PW = '#34885e';
-  /* SPI and chip selects from J1 to the ESP32 headers */
-  for (let i = 0; i < 7; i++){ const x = -7.6 + i*1.27, zz = -14.2 - i*.9; line([[x,-8.9],[x,zz],[26+i*.9,zz],[26+i*.9,-20],[38.6,-22-i*2.54]], .32, TR); }
-  for (let i = 0; i < 9; i++){ const x = -5 + i*1.27, zz = 14.2 + i*.8; line([[x,8.9],[x,zz],[30+i*.5,zz],[34,-6-i],[38.6,-14-i*2.54]], .32, TR); }
-  /* Figaro AOUT to ADS1115 */
-  line([[-42,-24],[-52,-24],[-52,16],[28,16.5],[30,24]], .35, TR);
-  line([[-42,-46],[-54,-46],[-54,17.5],[29,17.5],[31.5,24]], .35, TR);
-  line([[40,5],[40,16],[33,24]], .35, TR); line([[50,5],[50,17],[34.5,24]], .35, TR);
-  /* I2C to the ESP32 */
-  line([[38,27],[47,27],[61.4,8],[61.4,-20]], .35, TR); line([[38,29],[48,29],[62.6,9],[62.6,-24]], .35, TR);
-  /* Power rails */
-  line([[-34,48],[-30,34],[26,34],[44,20],[44,5]], 1, PW);
-  line([[-42,-24],[-40,-30],[-40,-46]], .8, PW);
-  line([[-34,44],[-30,20],[-46,14],[-46,-24]], .8, PW);
-  line([[-50,34],[-58,34]], 1.2, PW); line([[-50,34],[-34,44]], 1, PW);
-  const GOLD = '#cfa94f';
+  const TR = '#59b98a', PW = '#e0b24a', GOLD = '#cfa94f';
+  /* ENIG copper floor inside the gasket line */
+  g.fillStyle = '#b99a45'; g.beginPath(); POCKET.forEach((p, i) => i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1])); g.closePath(); g.fill();
   const pad = (x,z,w,h) => { g.fillStyle = GOLD; g.fillRect(x-w/2, z-h/2, w, h); };
   const dot = (x,z,r,c) => { g.fillStyle = c; g.beginPath(); g.arc(x,z,r,0,Math.PI*2); g.fill(); };
-  for (let i = 0; i < 7; i++) pad((i-3)*1.27, -8.89, .8, 1.6);
-  for (let i = 0; i < 9; i++) pad((i-4)*1.27, 8.89, .8, 1.6);
-  for (let i = 0; i < 15; i++) [ESPX-11.43, ESPX+11.43].forEach(x => { const z = ESPZ + (i-7)*2.54; dot(x, z, .9, GOLD); dot(x, z, .45, '#0e2a1d'); });
-  /* reserved ENS160 land pattern */
-  for (let a = 0; a < 2; a++) for (let b = 0; b < 2; b++) pad(13-1+a*2, 0-1+b*2, .7, .7);
+  /* shuttle socket pads: P1 = 7 pins on the -x row, P2 = 9 pins on the +x row */
+  const p1 = i => [XS - DIM.shut.rowGap/2, SH.z - (i-4)*1.27], p2 = j => [XS + DIM.shut.rowGap/2, SH.z - (j-5)*1.27];
+  let k = 0;
+  const toPin = (src, gpio, left) => { const t = espPin(gpio), bx = 7 + k*1.1, pts = [src];
+    if (left){ const lx = -47 - k*.9, rz = -44 - k*.9; pts.push([lx, src[1]], [lx, rz], [bx, rz]); } else pts.push([bx, src[1]]);
+    pts.push([bx, t[1]], [t[0], t[1]]); line(pts, .32, TR); k++; };
+  [4,5,6,7].forEach((gp, i) => toPin(p1(4+i), gp, true));
+  [[2,12],[3,13],[4,11],[5,15],[6,16],[7,17],[8,18],[9,47]].forEach(a => toPin(p2(a[0]), a[1], false));
+  /* I2C from the ADS1115 */
+  const sda = espPin(8), scl = espPin(9);
+  line([[20,-4.6],[24,-4.6],[24,sda[1]],[sda[0],sda[1]]], .32, TR); line([[20,-3.4],[25.2,-3.4],[25.2,scl[1]],[scl[0],scl[1]]], .32, TR);
+  /* Figaro AOUT through the dividers to A0 and A1 */
+  line([[13,8],[13,1],[16.5,-2.5]], .32, TR); line([[25,8],[25,2.5],[19.5,-2.5]], .32, TR);
+  /* pump PWM, servo signal, servo load switch, battery sense */
+  const pp = espPin(21), ps = espPin(14), pq = espPin(10), pb = espPin(1);
+  line([[pp[0],pp[1]],[30,pp[1]],[30,-52],[21.8,-52]], .32, TR);
+  line([[ps[0],ps[1]],[28.6,ps[1]],[28.6,-56],[-58,-56],[-58,2],[-54,2]], .32, TR);
+  line([[pq[0],pq[1]],[27.4,pq[1]],[27.4,-57.6],[-59.6,-57.6],[-59.6,10],[-55.4,10]], .32, TR);
+  line([[pb[0],pb[1]],[32,pb[1]],[32,14],[40,14]], .32, TR);
+  /* power: battery, charger, switch, 5 V boost, sensor LDO, pump */
+  line([[44,30],[50,44],[60,40]], 1, PW); line([[50,44],[62,24]], 1, PW);
+  line([[62,24],[56,8],[32.5,8],[32.5,-30],[20,-30]], 1, PW);
+  line([[20,-30],[20,14],[13,11]], .8, PW); line([[20,14],[25,11]], .8, PW);
+  line([[20,-30],[20,-58.8],[-61,-58.8],[-61,10],[-54,10]], .8, PW);
+  line([[20,-30],[20,-47],[-52,-47],[-52,-10]], .8, PW);
+  line([[-52,-10],[-45,-10],[-45,p1(1)[1]],[p1(1)[0],p1(1)[1]]], .6, PW); line([[-45,p1(2)[1]],[p1(2)[0],p1(2)[1]]], .6, PW);
+  line([[56,8],[26,-6],[20,-52]], .8, PW);
+  for (let i = 1; i <= 7; i++){ const p = p1(i); pad(p[0], p[1], 1.6, .8); }
+  for (let j = 1; j <= 9; j++){ const p = p2(j); pad(p[0], p[1], 1.6, .8); }
+  for (let i = 0; i < e.pins; i++) [1,-1].forEach(sd => { const x = e.x + sd*e.rowGap/2, z = e.z + (e.pins-1)/2*2.54 - i*2.54; dot(x, z, .9, GOLD); dot(x, z, .45, '#0e2a1d'); });
   g.globalAlpha = .85;
-  [[34,27,9,7],[-34,44,8,8],[-50,34,6,6],[24,40,6,4],[28,-24,5,4],[22,-14,4,3],[20,30,4,3]].forEach(([x,z,w,h]) => pad(x,z,w,h));
+  [[18,-4,5,4],[20,-30,8,8],[-52,-10,5,4],[20,-52,5,4],[26,-52,4,3],[-54,10,4,3],[50,44,6,6],[40,14,3,2]].forEach(a => pad(a[0],a[1],a[2],a[3]));
   g.globalAlpha = 1;
-  HOLES.forEach(([x,z]) => { dot(x,z,2.8,GOLD); dot(x,z,1.6,'#0b1a13'); });
+  HOLES.forEach(h => { dot(h[0],h[1],2.8,GOLD); dot(h[0],h[1],1.6,'#0b1a13'); });
+  dot(OUT.x, OUT.z, 1.7, GOLD); dot(OUT.x, OUT.z, 1, '#0b1a13');
   const S = '#e8efe9'; g.strokeStyle = S; g.fillStyle = S; g.lineWidth = .22;
-  g.setLineDash([1.4,.9]); g.strokeRect(-20,-60,40,76); g.setLineDash([]);
-  g.strokeRect(ESPX-12.75,ESPZ-25.5,25.5,51);
-  g.strokeRect(-10.6,-11.6,21.2,23.2);
-  g.strokeRect(11,-2,4,4);
+  g.setLineDash([1.4,.9]); g.strokeRect(CH.x0, CH.zR, CH.x1 - CH.x0, CH.zF - CH.zR); g.setLineDash([]);
+  g.strokeRect(e.x - e.W/2, e.z - e.L/2, e.W, e.L);
+  g.strokeRect(XS - DIM.shut.W/2 - .6, SH.z - DIM.shut.L/2 - .6, DIM.shut.W + 1.2, DIM.shut.L + 1.2);
   g.textBaseline = 'middle';
-  const txt = (s, x, z, size, w, font) => { g.font = (w || 600) + ' ' + size + 'px ' + (font || FD); g.fillText(s, x, z); };
-  txt('GASKET LINE', -19, 14.2, 1.5, 500, FM);
-  txt('J1 BME690 8X', -10.6, -13, 1.7);
-  txt('U8 ENS160 DNP', 7.5, 3.4, 1.3);
-  txt('U1 ESP32 DEVKIT', ESPX-9, ESPZ-27, 2);
-  txt('J10', -47, -28, 1.7); txt('J11', -47, -50, 1.7); txt('J12', 36.5, 10, 1.7); txt('J13', 46.5, 10, 1.7);
-  txt('U3 ADS1115', 29, 22, 1.7);
-  txt('U6 5V HEATER BOOST', -44, 37.6, 1.5); txt('U7 CHG+PROT', -58, 28.4, 1.5);
-  txt('U4 3V3 SENSOR', 19, 37.4, 1.5); txt('Q1 PUMP', 24, -28, 1.5); txt('D1', 19.5, -11.4, 1.5); txt('Q2 SERVO', 15.5, 27, 1.5);
-  txt('D2', 33, 50, 1.5);
-  txt('SNIFF HUB', -56, 46.5, 4.2, 700);
-  txt('REV B · SDP27 · UMASS ECE', -56, 51, 1.7, 500, FM);
+  const txt = (s, x, z, size, w, font, al) => { g.font = (w || 600) + ' ' + size + 'px ' + (font || FD); g.textAlign = al || 'left'; g.fillText(s, x, z); };
+  txt('GASKET LINE · ENIG FLOOR', CH.x0 + 1, CH.zR + 2, 1.5, 500, FM);
+  txt('J1 BME690 8X', XS - 6, SH.z, 1.7);
+  txt('OUTLET', OUT.x + 2.4, OUT.z, 1.4, 500, FM);
+  txt('U1 ESP32-S3 DEV BOARD', e.x - e.W/2, e.z + e.L/2 + 1.6, 1.8);
+  /* GPIO labels beside the header pins */
+  Object.keys(NETS).forEach(gp => { const t = espPin(Number(gp)); const s = 'IO' + gp + ' ' + NETS[gp];
+    if (t[2] > 0) txt(s, t[0] - 1.6, t[1], 1.45, 500, FM, 'right'); else txt(s, t[0] + 1.6, t[1], 1.45, 500, FM, 'left'); });
+  txt('J10', 9, 12.6, 1.7); txt('J11', 21, 12.6, 1.7); txt('U3 ADS1115 · A0 A1', 9, -7.4, 1.5);
+  txt('U6 5V BOOST', 9.5, -36, 1.5); txt('U4 3V3 SENSOR LDO', -62, -13.4, 1.4); txt('Q1 PUMP', 13.6, -55.2, 1.4); txt('D1', 28.6, -50.2, 1.4);
+  txt('Q2 SERVO', -62, 13.2, 1.4); txt('J22', -62, 4.6, 1.5); txt('U7 CHG+PROT', 42, 49.6, 1.5); txt('USB-C', 54, 35.4, 1.4); txt('SW', 58.4, 19.6, 1.4);
+  txt('VBAT SENSE', 34, 16.6, 1.3, 500, FM); txt('J21 (BOTTOM)', 22, -8.6, 1.3, 500, FM); txt('J20 (BOTTOM)', 36, 27, 1.3, 500, FM);
+  txt('SNIFF HUB', -61, -52, 4.2, 700);
+  txt('REV C · SDP27 · UMASS ECE', -61, -47.6, 1.7, 500, FM);
 }
 function drawShuttle(g){
   g.translate(10, 11);
@@ -416,8 +717,8 @@ function drawCan(g){
   g.translate(8.8, 7.8);
   g.fillStyle = '#c3c7ca'; g.fillRect(-8.8,-7.8,17.6,15.6);
   g.fillStyle = '#7d8489'; g.textBaseline = 'middle';
-  g.font = '600 1.9px ' + FD; g.fillText('ESP32-WROOM-32D', -7.2, -3);
-  g.font = '500 1.05px ' + FM; g.fillText('WI-FI + BT · 4 MB FLASH', -7.2, -.6);
+  g.font = '600 1.9px ' + FD; g.fillText('ESP32-S3-WROOM-1', -7.2, -3);
+  g.font = '500 1.05px ' + FM; g.fillText('WI-FI + BLE · DEV BOARD', -7.2, -.6);
 }
 function drawBatt(g){
   g.fillStyle = '#21507a'; g.fillRect(0,0,58,70);
@@ -493,312 +794,361 @@ function build3D(){
   PARTS.forEach(p => { const g = new THREE.Group(); g.userData.part = p.id; scene.add(g); p.group = g; p.offV = new THREE.Vector3().fromArray(p.off); p.ancV = new THREE.Vector3().fromArray(p.anc); });
   const G = id => byId[id].group;
   const brass = M(0xb89a52, {metalness:.7, roughness:.38});
+  const E = DIM.enc;
+  /* shapes from world x, z points; extrude upward from y0 */
+  const polyS = pts => { const s = new THREE.Shape(); pts.forEach((p, i) => i ? s.lineTo(p[0], -p[1]) : s.moveTo(p[0], -p[1])); s.closePath(); return s; };
+  const polyP = pts => { const s = new THREE.Path(); pts.forEach((p, i) => i ? s.lineTo(p[0], -p[1]) : s.moveTo(p[0], -p[1])); s.closePath(); return s; };
+  const rectP = (x0, x1, z0, z1) => [[x0,z0],[x1,z0],[x1,z1],[x0,z1]];
+  function extr(parent, shape, h, mat, y0){ const g = new THREE.ExtrudeGeometry(shape, {depth:h, bevelEnabled:false, curveSegments:16}); g.rotateX(-Math.PI/2); return add(parent, g, mat, 0, y0, 0); }
+  /* tube wall along z, from z0 to z1 */
+  function zt(parent, ro, ri, z0, z1, mat, x, y){ const s = new THREE.Shape(); s.absarc(0, 0, ro, 0, Math.PI*2, false); s.holes.push(circ(0, 0, ri)); const g = new THREE.ExtrudeGeometry(s, {depth:Math.abs(z1-z0), bevelEnabled:false, curveSegments:24}); return add(parent, g, mat, x, y, Math.min(z0, z1)); }
+  const hexZ = (parent, r, z0, z1, mat, x, y) => { const g = new THREE.CylinderGeometry(r, r, Math.abs(z1-z0), 6); g.rotateX(Math.PI/2); return add(parent, g, mat, x, y, (z0+z1)/2); };
+  const hexX = (parent, r, x0, x1, mat, y, z) => { const g = new THREE.CylinderGeometry(r, r, Math.abs(x1-x0), 6); g.rotateZ(Math.PI/2); return add(parent, g, mat, (x0+x1)/2, y, z); };
+  function gearGeo(teeth, m, t){ const s = new THREE.Shape(), rp = teeth*m/2, ra = rp + m, rf = rp - 1.25*m, st = Math.PI*2/teeth;
+    for (let i = 0; i < teeth; i++){ const a = i*st; [[rf,-.25],[ra,-.1],[ra,.1],[rf,.25]].forEach((q, j) => { const x = q[0]*Math.cos(a + q[1]*st), y = q[0]*Math.sin(a + q[1]*st); if (i === 0 && j === 0) s.moveTo(x, y); else s.lineTo(x, y); }); }
+    s.closePath(); const g = new THREE.ExtrudeGeometry(s, {depth:t, bevelEnabled:false}); g.rotateX(-Math.PI/2); return g; }
+  /* objects that exist for one valve type only */
+  const vtObjs = {med:[], ham:[]};
+  function vtG(partId, type){ const g = new THREE.Group(); G(partId).add(g); vtObjs[type].push(g); return g; }
+  const plugs = [], spinS = [];      /* turn with the valve plug / with the servo gear */
+  const alu = () => M(0xb9c0c2, {metalness:.45, roughness:.42});
+  const ppS = M(0xf4f6f5, {roughness:.4});
+  const ppClear = () => new THREE.MeshStandardMaterial({color:0xe9f1f4, roughness:.25, metalness:0, transparent:true, opacity:.42, side:THREE.DoubleSide, depthWrite:false});
+  const sealM = M(0x2b2d2c, {roughness:.8});
+  const scrM = M(0x60686a, {metalness:.7, roughness:.35});
 
   /* 2 Bottom tray */
   (function(){ const g = G('tray'); const petg = M(0xd3d9d6, {roughness:.78}); const dark = M(0x111514, {roughness:.9}); const rub = M(0x2a2d2c, {roughness:.95});
-    slab(g, 136, 130, 2.5, 10, petg, 0, 0, 0);
-    ring(g, 136, 130, 10, 2.5, 24, petg, 0, 0, 0);
-    cRing(g, 136, 130, 10, 2.5, 68, 12, petg, 24);
-    for (let i = 0; i < 5; i++) B(g, 20, 1.6, .8, dark, 55, 11 + i*3.4, -64.9);
-    B(g, 9.4, 2.4, .8, dark, -67.9, 33.6, 30).rotation.y = Math.PI/2;
-    B(g, 7, 2.4, .8, dark, -67.9, 33.6, 48).rotation.y = Math.PI/2;
-    HOLES.forEach(([x,z]) => cyl(g, 2.6, 29.5, brass.clone(), x, 2.5, z));
-    [[-54,-52],[54,-52],[-54,52],[54,52]].forEach(([x,z]) => cyl(g, 4, 1.2, rub, x, -1.2, z));
+    slab(g, E.W, E.D, E.wall, E.r, petg, 0, 0, 0);
+    ring(g, E.W, E.D, E.r, E.wall, E.winY0, petg, 0, 0, 0);
+    cRing(g, E.W, E.D, E.r, E.wall, E.winW, E.split - E.winY0, petg, E.winY0);
+    zt(g, 4.4, DIM.sil.od/2, -E.D/2 - .5, -E.D/2 + E.wall + .2, dark, PUMP.x, PUMP.y);               /* exhaust vent */
+    B(g, .8, 3.6, 9.6, dark, E.W/2 - .1, HT - .2, 40); B(g, .8, 3.6, 7.8, dark, E.W/2 - .1, HT - .2, 24);   /* USB-C and switch openings */
+    HOLES.forEach(h => cyl(g, 2.6, HT - DIM.hub.t - E.wall, brass.clone(), h[0], E.wall, h[1]));
+    [[-54,-52],[54,-52],[-54,52],[54,52]].forEach(p => cyl(g, 4, 1.2, rub, p[0], -1.2, p[1]));
   })();
 
   /* 1 Top shell */
   (function(){ const g = G('lid'); const ch = M(0x2f3734, {roughness:.62}); const dark = M(0x0e1211, {roughness:.9});
-    cRing(g, 136, 130, 10, 2.5, 68, 20, ch, 36);
-    ring(g, 136, 130, 10, 2.5, 4.5, ch, 0, 56, 0);
-    slab(g, 136, 130, 2.5, 10, ch, 0, 60.5, 0);
-    B(g, 9.6, 3.6, .8, dark, ESPX, 45.8, -64.9);
+    cRing(g, E.W, E.D, E.r, E.wall, E.winW, E.winY1 - E.split, ch, E.split);
+    ring(g, E.W, E.D, E.r, E.wall, E.H - E.wall - E.winY1, ch, 0, E.winY1, 0);
+    slab(g, E.W, E.D, E.wall, E.r, ch, 0, E.H - E.wall, 0);
+    B(g, 9.6, 3.6, .8, dark, DIM.esp.x, HT + DIM.esp.seat + 1.2, -E.D/2 + .1);                       /* ESP32-S3 USB slot */
     const pipe = M(0xcdeedb, {emissive:0x3dbb78, emissiveIntensity:.55, roughness:.2, transparent:true, opacity:.85});
-    cyl(g, 1.4, 28.8, pipe, 30, 34.4, 50, 16);
-    decal(g, 46, 13, canvasTex(46, 13, 12, drawLid), -30, 63.06, 40);
+    cyl(g, 1.4, E.H - HT - .8, pipe, 40, HT + .8, 56, 16);
+    decal(g, 46, 13, canvasTex(46, 13, 12, drawLid), -30, E.H + .06, 44);
+    for (let i = 0; i < 5; i++) B(g, 30, .5, 2, dark, XS, E.H - .3, CAN.z - 2 + i*5.5);              /* vent slots above the Figaro modules */
+    for (let i = 0; i < 5; i++) B(g, .8, 9, 2, dark, E.W/2 - .1, 42, -30 + i*5.5);                   /* vent slots near the ESP32-S3 */
   })();
 
-  /* 3 Nose shroud: a sculpted height field trimmed around the nostril cones */
-  (function(){ const g = G('shroud'); const skin = M(0x2f3734, {roughness:.5, side:THREE.DoubleSide});
-    const yc = 40, bw = 68, bh = 32;
-    const s = rr(bw, bh, 5); [-NX, NX].forEach(sx => s.holes.push(circ(sx, AY - yc, 9.4)));
-    const pg = new THREE.ExtrudeGeometry(s, {depth:2.5, bevelEnabled:false, curveSegments:24}); add(g, pg, skin, 0, yc, 62.5);
-    const nx = 170, ny = 110, pos = [], idx = [], z0 = 65;
+  /* 3 Nose shroud: a sculpted height field trimmed around the two liners */
+  (function(){ const g = new THREE.Group(); g.position.x = NC; G('shroud').add(g); const skin = M(0x2f3734, {roughness:.5, side:THREE.DoubleSide});
+    const yc = AY, bw = 72, bh = 32, hw = bw/2, NX2 = (XC - XS)/2, RH = DIM.liner.od/2 + .6, z0 = E.D/2;
+    const s = rr(bw, bh, 5); [-NX2, NX2].forEach(sx => s.holes.push(circ(sx, 0, RH)));
+    const pg = new THREE.ExtrudeGeometry(s, {depth:E.wall, bevelEnabled:false, curveSegments:24}); add(g, pg, skin, 0, yc, z0 - E.wall);
+    const nx = 170, ny = 110, pos = [], idx = [];
     const sm = (a, b) => Math.pow(a*a*a*a + b*b*b*b, .25);
-    const H = (x, y) => { const u = x/34, v = (y-yc)/16; const w = Math.max(0, 1 - Math.pow(Math.abs(u),3.2) - Math.pow(Math.abs(v),3.2));
-      const ry = y > 45 ? (y-45)/10 : (45-y)/8; const ridge = 29*Math.exp(-(x/10)*(x/10))*Math.exp(-ry*ry);
-      const ax = (Math.abs(x)-NX)/17, ay = (y-AY)/14; const wing = 23*Math.exp(-ax*ax-ay*ay);
-      const d = Math.hypot(Math.abs(x)-NX, y-AY); const lim = 19.2 + Math.max(0, d-13)*1.6;
-      const h = sm(ridge, wing)*Math.min(1, w*2.6); return lim - sm(Math.max(0, lim-h), .6) + .0; };
-    for (let j = 0; j <= ny; j++) for (let i = 0; i <= nx; i++){ const x = -34 + 68*i/nx, y = 24 + 32*j/ny; pos.push(x, y, z0 + H(x,y)); }
+    const Hf = (x, y) => { const u = x/hw, v = (y-yc)/16; const w = Math.max(0, 1 - Math.pow(Math.abs(u),3.2) - Math.pow(Math.abs(v),3.2));
+      const ry = y > yc+5 ? (y-yc-5)/10 : (yc+5-y)/8; const ridge = 18*Math.exp(-(x/10)*(x/10))*Math.exp(-ry*ry);
+      const ax = (Math.abs(x)-NX2)/17, ay = (y-AY)/14; const wing = 14*Math.exp(-ax*ax-ay*ay);
+      const d = Math.hypot(Math.abs(x)-NX2, y-AY); const lim = 10 + Math.max(0, d-13)*1.6;
+      const h = sm(ridge, wing)*Math.min(1, w*2.6); return lim - sm(Math.max(0, lim-h), .6) + .25; };
+    for (let j = 0; j <= ny; j++) for (let i = 0; i <= nx; i++){ const x = -hw + bw*i/nx, y = yc - 16 + bh*j/ny; pos.push(x, y, z0 + Hf(x, y)); }
     for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++){ const a = j*(nx+1)+i, b = a+nx+1;
-      const cx = -34 + 68*(i+.5)/nx, cy = 24 + 32*(j+.5)/ny;
-      if (Math.hypot(Math.abs(cx)-NX, cy-AY) < 10.2) continue;
+      const cx = -hw + bw*(i+.5)/nx, cy = yc - 16 + bh*(j+.5)/ny;
+      if (Math.hypot(Math.abs(cx)-NX2, cy-AY) < RH + .8) continue;
       idx.push(a, a+1, b, b, a+1, b+1); }
     const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setIndex(idx); geo.computeVertexNormals();
     add(g, geo, skin);
   })();
 
-  /* 4, 5 Nostrils: cone, barrel and filter stack. Sample is on the -x side. */
+  /* 4, 5 Nostrils: polypropylene syringe-barrel liners with Luer-lock tips */
   const glows = {};
-  function nostril(id, sx, fill){ const g = G(id);
-    const pts = [[7,66],[9.2,66],[9.2,68],[10.2,74],[12.2,84],[12.2,85.5],[11.2,85.5],[8.8,74],[7,68],[7,66]].map(a => new THREE.Vector2(a[0], a[1]));
-    const cg = new THREE.LatheGeometry(pts, 48); cg.rotateX(Math.PI/2);
-    add(g, cg, M(0x3a4340, {roughness:.42, side:THREE.DoubleSide}), sx, AY, 0);
-    zc(g, 9, 40, 66, clearM(.26, 0xdfe9e6), sx, AY, 36, true);
-    zc(g, 9.6, 58, 62.5, M(0x3a4340, {roughness:.5}), sx, AY, 36);
-    zc(g, 3, 36.5, 40, M(0x3a4340, {roughness:.5}), sx, AY);
-    const gm = new THREE.MeshBasicMaterial({color:0x46dc8c, transparent:true, opacity:.25, side:THREE.DoubleSide});
-    const rg = new THREE.RingGeometry(11.25, 12.2, 48); add(g, rg, gm, sx, AY, 85.6); glows[id] = gm;
-    fill(g, sx);
-  }
-  nostril('noseS', -NX, (g, sx) => {
-    const wht = M(0xf1efe8, {roughness:.85}); const st = M(0xaeb6ba, {metalness:.7, roughness:.35});
-    zc(g, 8.6, 56, 56.8, wht, sx, AY, 32);
-    zc(g, 8.6, 57.2, 57.8, st, sx, AY, 32);
-    zc(g, 8.7, 42, 44, M(0x4b5552, {roughness:.5}), sx, AY, 32);
-  });
-  nostril('noseR', NX, (g, sx) => {
-    const pad = M(0xe9eadf, {roughness:.95});
-    const ct = canvasTex(44, 26, 7, drawCarbon); ct.wrapS = ct.wrapT = THREE.RepeatWrapping;
-    zc(g, 8.6, 57, 60.5, pad, sx, AY, 32);
-    zc(g, 8.6, 43.5, 57, M(0x2a2b2b, {map:ct, roughness:.95}), sx, AY, 32);
-    zc(g, 8.6, 40.6, 43.5, pad, sx, AY, 32);
-  });
-
-  /* 6 Three-way stopcock */
-  let plug = null, horn = null;
-  (function(){ const g = G('valve'); const z = 28;
-    const body = M(0xe7edf0, {transparent:true, opacity:.78, roughness:.25});
-    cyl(g, 6, 11, body, 0, AY-5.5, z, 32);
-    xc(g, 3, -10, -5, body, AY, z); xc(g, 3, 5, 10, body, AY, z);
-    zc(g, 3, 19.2, 23, body, 0, AY, 24);
-    zc(g, 1.6, 22.8, 19, M(0xcfd8db, {roughness:.3}), 0, AY);
-    B(g, 8, 1, 8, M(0x4d5855, {roughness:.5}), 0, AY-7, z);
-    plug = new THREE.Group(); plug.position.set(0, AY+5.6, z); g.add(plug);
-    cyl(plug, 5, .8, M(0x2e6fb3, {roughness:.4}), 0, 0, 0, 32);
-    const w = M(0xf4f6f5, {roughness:.4, emissive:0x333333});
-    B(plug, 8, .3, 1.6, w, 0, .8, 0); B(plug, 1.6, .3, 4, w, 0, .8, 2);
+  function liner(g, x, z0, len){ const li = DIM.liner;
+    zt(g, li.od/2, li.id/2, z0, z0 + len, ppClear(), x, AY);
+    zt(g, li.od/2, li.tipBore/2, z0, z0 + li.bottomT, ppClear(), x, AY);
+    zt(g, li.tipOD/2, li.tipBore/2, z0 - li.tipL, z0, ppS, x, AY);
+    zt(g, li.lockOD/2, li.lockOD/2 - 1, z0 - li.lockL, z0, ppS, x, AY); }
+  function glowRing(g, id, x, z){ const gm = new THREE.MeshBasicMaterial({color:0x46dc8c, transparent:true, opacity:.25, side:THREE.DoubleSide}); add(g, new THREE.RingGeometry(DIM.liner.od/2 + .3, DIM.liner.od/2 + 1.3, 48), gm, x, AY, z); glows[id] = gm; }
+  (function(){ const g = G('noseS'), n = DIM.noseS, li = DIM.liner, z0 = VT.bottomZ; liner(g, XS, z0, n.len);
+    let z = z0 + li.bottomT + n.gapBack; const r = li.id/2 - .15;
+    zc(g, r, z, z + n.membT, M(0xf6f5ee, {roughness:.9}), XS, AY, 32); z += n.membT;
+    zc(g, r, z, z + n.meshT, M(0xaeb6ba, {metalness:.7, roughness:.35}), XS, AY, 32); z += n.meshT;
+    zt(g, r, r - 1.6, z, z + n.ringT, ppS, XS, AY);
+    glowRing(g, 'noseS', XS, z0 + n.len + .1);
+  })();
+  const gR = new THREE.Group(); G('noseR').add(gR);       /* moves in z with the valve type */
+  (function(){ const n = DIM.noseR, li = DIM.liner, e = DIM.elbow, Z0 = VT.ham.zv, cz = VT.ham.cartZ;
+    B(gR, e.w, e.h, e.w, alu(), XC, AY - e.h/2, Z0);
+    hexZ(gR, 4.5, Z0 + e.w/2, Z0 + e.w/2 + e.luerAd, ppS, XC, AY);
+    liner(gR, XC, cz, n.len);
+    const pad = M(0xe9eadf, {roughness:.95}); const ct = canvasTex(44, 26, 7, drawCarbon); ct.wrapS = ct.wrapT = THREE.RepeatWrapping;
+    let z = cz + li.bottomT; const r = li.id/2 - .15;
+    zc(gR, r, z, z + n.padT, pad, XC, AY, 32); z += n.padT;
+    zc(gR, r, z, z + n.bedL, M(0x2a2b2b, {map:ct, roughness:.95}), XC, AY, 32); z += n.bedL;
+    zc(gR, r, z, z + n.padT, pad, XC, AY, 32);
+    zt(gR, li.od/2 + 1.6, li.od/2 + .05, cz + n.len - 5, cz + n.len, M(0x3a4340, {roughness:.5}), XC, AY);      /* printed grip ring, outside the liner */
+    glowRing(gR, 'noseR', XC, cz + n.len + .1);
+    const gh = new THREE.Group(); gR.add(gh); vtObjs.ham.push(gh); hexX(gh, 4.5, XC - e.w/2 - DIM.fit.nutHead, XC - e.w/2, ppS, AY, Z0);
+    const gm = new THREE.Group(); gR.add(gm); vtObjs.med.push(gm); xc(gm, 4, XC - e.w/2 - e.luerAdM, XC - e.w/2, ppS, AY, Z0, 16);
   })();
 
-  /* 7 Servo */
-  (function(){ const g = G('servo'); const z = 28; const blk = M(0x24272a, {roughness:.5}); const met = M(0xb6bcbf, {metalness:.8, roughness:.3});
-    const cz = z + 5.9; /* shaft sits toward one end of the body */
-    B(g, 12.2, 22.7, 22.8, blk, 0, 4.3, cz);
-    B(g, 12.2, 2.5, 32.2, blk, 0, 20.2, cz);
-    cyl(g, 6, 2, blk, 0, 27, z, 24);
-    cyl(g, 2.4, 3, met, 0, 29, z, 16);
-    [cz-14, cz+14].forEach(zz => cyl(g, 1.1, 2.7, brass.clone(), 0, 20.1, zz, 10));
-    B(g, 20, 3, 8, M(0x777f7c, {roughness:.7}), 0, 1.5, cz); /* base foot */
-    B(g, 20, 3, 8, M(0x777f7c, {roughness:.7}), 0, 1.5, cz-12);
-    horn = new THREE.Group(); horn.position.set(0, 29.6, z); g.add(horn);
-    cyl(horn, 4, 3.4, M(0xeee9dc, {roughness:.6}), 0, 0, 0, 24);
-    B(horn, 3, 1.2, 14, M(0xeee9dc, {roughness:.6}), 0, .4, 4);
-    cyl(horn, 3.4, 3, M(0xd9d3c4, {roughness:.6}), 0, 3.4, 0, 3);
+  /* 6 Three-way valve, two types */
+  (function(){ const m = DIM.med, h = DIM.ham, e = DIM.elbow, f = DIM.fit;
+    (function(){ const g = vtG('valve', 'med'), zv = VT.med.zv; const body = M(0xe7edf0, {transparent:true, opacity:.8, roughness:.25}); const blue = M(0x2e6fb3, {roughness:.4});
+      cyl(g, m.bodyD/2, m.bodyH, body, XS, AY - m.bodyH/2, zv, 32);
+      zt(g, m.portD/2, m.bore/2, zv + m.bodyD/2 - 1, zv + m.portF, body, XS, AY); zt(g, m.portD/2 + 1.2, m.portD/2, zv + m.portF - 2, zv + m.portF, body, XS, AY);
+      zt(g, m.portD/2 - .6, m.bore/2, zv - m.portM, zv - m.bodyD/2 + 1, body, XS, AY); zt(g, m.lockOD/2, m.lockOD/2 - 1, zv - m.portM, zv - m.portM + 9, M(0xcfd8db, {roughness:.3}), XS, AY);
+      xc(g, m.portD/2, XS + m.bodyD/2 - 1, XS + m.portF, body, AY, zv);
+      cyl(g, 3, m.handleY - m.bodyH/2, blue, XS, AY + m.bodyH/2, zv, 16);
+      const p = new THREE.Group(); p.position.set(XS, AY + m.handleY, zv); g.add(p); plugs.push(p);
+      cyl(p, 5, m.handleT, blue, 0, 0, 0, 32); B(p, m.handleL, m.handleT - 1, 5, blue, m.handleL/2, 0, 0);
+    })();
+    (function(){ const g = vtG('valve', 'ham'), zv = VT.ham.zv; const hs = M(0x8f989c, {metalness:.55, roughness:.4});
+      B(g, h.body, h.body, h.body, hs, XS, AY - h.body/2, zv);
+      cyl(g, h.stemD/2, h.stem - h.body/2, ppS, XS, AY + h.body/2, zv, 20);
+      hexZ(g, 4.5, zv + h.body/2, zv + h.body/2 + e.luerAd, ppS, XS, AY);
+      hexZ(g, 4.5, zv - h.body/2 - f.nutHead, zv - h.body/2, ppS, XS, AY);
+      hexX(g, 4.5, XS + h.body/2, XS + h.body/2 + f.nutHead, ppS, AY, zv);
+    })();
   })();
 
-  /* 8 Sensor chamber */
-  (function(){ const g = G('chamber'); const cz = -22;
-    const body = M(0xb9c0c2, {metalness:.45, roughness:.42}); const gas = M(0x1b1d1c, {roughness:.95}); const seal = M(0x2b2d2c, {roughness:.8});
-    ring(g, 40, 76, 3, 3, 1, gas, 0, HT, cz);
-    ring(g, 40, 76, 3, 3, 9, body, 0, HT+1, cz);
-    const holes = []; FIG.zs.forEach(z => [-FIG.x, FIG.x].forEach(x => holes.push(circ(x, -(z-cz), FIG.canD/2 + .25))));
-    slab(g, 40, 76, 3, 3, body, 0, HT+10, cz, holes);
-    FIG.zs.forEach(z => [-FIG.x, FIG.x].forEach(x => { const t = new THREE.TorusGeometry(FIG.flD/2, .7, 10, 30); t.rotateX(Math.PI/2); add(g, t, seal, x, HT+13.1, z); }));
-    zc(g, 3, 16, 18.8, body, 0, AY);
-    [[-17.5,13],[17.5,13],[-17.5,-57],[17.5,-57]].forEach(([x,z]) => cyl(g, 1.3, 1, M(0x60686a, {metalness:.7, roughness:.35}), x, HT+13, z, 10));
+  /* 7 Servo and 1:1 gear pair, one set for each valve type */
+  (function(){ const sv = DIM.servo, gr = DIM.gear; const blk = M(0x24272a, {roughness:.5}); const met = M(0xb6bcbf, {metalness:.8, roughness:.3});
+    const prn = M(0xeee9dc, {roughness:.6}); const brk = M(0x777f7c, {roughness:.7}); const wht = M(0xfbfcfb, {roughness:.4, emissive:0x444444}); const red = M(0xd8352a, {roughness:.4});
+    ['med', 'ham'].forEach(id => { const v = VT[id], g = vtG('servo', id), xv = XS - gr.cc, b = v.servoBase;
+      B(g, sv.W, sv.caseH, sv.L, blk, xv, b, v.bz);
+      B(g, sv.W, sv.earT, sv.earL, blk, xv, b + sv.earY, v.bz);
+      cyl(g, 5.8, 3, blk, xv, b + sv.caseH, v.zv, 24);
+      cyl(g, 2.4, v.gearY - (b + sv.caseH + 3), met, xv, b + sv.caseH + 3, v.zv, 16);
+      [v.bz - sv.earL/2 + 2.3, v.bz + sv.earL/2 - 2.3].forEach(zz => { cyl(g, 1.1, 1, brass.clone(), xv, b + sv.earY + sv.earT, zz, 10); B(g, sv.W, b + sv.earY - E.wall, 4.6, brk, xv, E.wall, zz); });
+      const gs = new THREE.Group(); gs.position.set(xv, v.gearY, v.zv); g.add(gs); spinS.push(gs);
+      const m1 = add(gs, gearGeo(gr.teeth, gr.m, gr.t), prn); m1.rotation.y = Math.PI/gr.teeth;
+      cyl(gs, 1.6, .8, met, 0, gr.t, 0, 12);
+      const gv = new THREE.Group(); gv.position.set(XS, v.gearY, v.zv); g.add(gv); plugs.push(gv);
+      add(gv, gearGeo(gr.teeth, gr.m, gr.t), prn);
+      B(gv, 1.6, .3, 9, wht, 0, gr.t, 0); B(gv, 4.5, .3, 1.6, wht, -2.25, gr.t, 0); cyl(gv, 1.3, .35, red, 6.5, gr.t, 0, 12);    /* T-bore mark; red dot = closed port */
+    });
   })();
 
-  /* 9 BME690 shuttle */
-  (function(){ const g = G('bme'); const cx = 0, cz = 0, yb = HT + 4.9;
+  /* 8 Sensor chamber: one block, open at the bottom */
+  (function(){ const g = G('chamber'), c = DIM.ch, cn = DIM.can, f = DIM.fig; const body = alu(); const gas = M(0x1b1d1c, {roughness:.95}); const prn = M(0x3a4340, {roughness:.6});
+    const outer = rectP(CH.x0, CH.x1, CH.zR, CH.zF);
+    const gs = polyS(outer); gs.holes.push(polyP(POCKET)); extr(g, gs, c.gasket, gas, HT);
+    /* left, rear and right walls as one U shape */
+    const U = [[CH.x0,CH.pF],[CH.x0,CH.zR],[CH.x1,CH.zR],[CH.x1,CH.pF]].concat(POCKET.slice(1)).concat([POCKET[0]]);
+    extr(g, polyS(U), CH.yC - CH.yB, body, CH.yB);
+    /* front wall with the inlet port: 1/4-28 flat-bottom port, then a 1.6 bore */
+    const fw = r => { const s = new THREE.Shape(); s.moveTo(CH.x0, CH.yB); s.lineTo(CH.x1, CH.yB); s.lineTo(CH.x1, CH.yC); s.lineTo(CH.x0, CH.yC); s.closePath(); s.holes.push(circ(XS, AY, r)); return s; };
+    add(g, new THREE.ExtrudeGeometry(fw(.8), {depth:c.wallF - DIM.fit.port, bevelEnabled:false, curveSegments:16}), body, 0, 0, CH.pF);
+    add(g, new THREE.ExtrudeGeometry(fw(3.2), {depth:DIM.fit.port, bevelEnabled:false, curveSegments:16}), body, 0, 0, CH.zF - DIM.fit.port);
+    const top = polyS(outer); CAN.xs.forEach(x => top.holes.push(circ(x, -CAN.z, cn.bodyD/2 + .2)));
+    extr(g, top, c.top, body, CH.yC);
+    CAN.xs.forEach(x => { const t = new THREE.TorusGeometry(cn.bodyD/2 + cn.oringCS/2, cn.oringCS/2, 10, 30); t.rotateX(Math.PI/2); add(g, t, sealM, x, CH.yT - .2, CAN.z); });
+    const zm = (CH.zF + CH.zR)/2 + 6;
+    [[CH.x0+3,CH.zF-3],[CH.x1-3,CH.zF-3],[CH.x0+3,CH.zR+3],[CH.x1-3,CH.zR+3],[CH.x0+3,zm],[CH.x1-3,zm]].forEach(p => cyl(g, 2.6, 1.6, scrM, p[0], CH.yT, p[1], 12));
+    /* clamp bridge over the two modules */
+    B(g, CH.x1 - CH.x0, 3, 8, prn, (CH.x0 + CH.x1)/2, FIGY + f.T, CAN.z);
+    [CH.x0 + 1.25, CH.x1 - 1.25].forEach(x => { B(g, 2.5, FIGY + f.T - CH.yT, 8, prn, x, CH.yT, CAN.z); cyl(g, 1.6, 1, scrM, x, FIGY + f.T + 3, CAN.z, 10); });
+    hexZ(vtG('chamber', 'med'), 4.5, CH.zF, CH.zF + DIM.elbow.luerAd, ppS, XS, AY);       /* female Luer adapter for the stopcock */
+    hexZ(vtG('chamber', 'ham'), 4.5, CH.zF, CH.zF + DIM.fit.nutHead, ppS, XS, AY);        /* flangeless nut for the PFA tube */
+  })();
+
+  /* 9 BME690 shuttle, header rows parallel to the flow */
+  (function(){ const g = new THREE.Group(); g.position.set(XS, 0, SH.z); g.rotation.y = Math.PI/2; G('bme').add(g); const s = DIM.shut, yb = SH.yB, hr = s.rowGap/2;
     const side = M(0x1f5a32); const top = new THREE.MeshStandardMaterial({map: canvasTex(20, 22, 24, drawShuttle), roughness:.5});
-    add(g, new THREE.BoxGeometry(20, 1.7, 22), [side, side, top, side, side, side], cx, yb + .85, cz);
+    add(g, new THREE.BoxGeometry(s.L, s.t, s.W), [side, side, top, side, side, side], 0, yb + s.t/2, 0);
     const lidM = M(0xbfc4c7, {metalness:.6, roughness:.32}); const dk = M(0x141716); const gold = M(0xd1ac55, {metalness:.85, roughness:.3}); const blk = M(0x1c1f21);
-    SENS.forEach(([sx,sz]) => { B(g,3,.93,3,lidM,cx+sx,yb+1.7,cz+sz); B(g,.6,.05,.6,dk,cx+sx+.7,yb+2.63,cz+sz-.7); });
-    B(g, 9.9, 1.2, 2.4, blk, cx, yb-1.2, cz-8.89); B(g, 12.4, 1.2, 2.4, blk, cx, yb-1.2, cz+8.89);
-    for (let i = 0; i < 7; i++) B(g, .4, 5, .4, gold, cx+(i-3)*1.27, yb-5, cz-8.89);
-    for (let i = 0; i < 9; i++) B(g, .4, 5, .4, gold, cx+(i-4)*1.27, yb-5, cz+8.89);
+    SENS.forEach(q => { B(g, 3, .93, 3, lidM, q[0], yb + s.t, q[1]); B(g, .6, .05, .6, dk, q[0] + .7, yb + s.t + .93, q[1] - .7); });
+    B(g, 9.9, 2.4, 2.4, blk, 0, yb - 2.4, -hr); B(g, 12.4, 2.4, 2.4, blk, 0, yb - 2.4, hr);
+    for (let i = 0; i < 7; i++) B(g, .4, s.pin, .4, gold, (i-3)*s.pitch, yb - s.pin, -hr);
+    for (let i = 0; i < 9; i++) B(g, .4, s.pin, .4, gold, (i-4)*s.pitch, yb - s.pin, hr);
   })();
 
-  /* 10 Figaro modules: board face down, can through the chamber lid */
-  (function(){ const g = G('fig');
+  /* 10 Figaro modules: board face down, can through the chamber top, header to the front */
+  (function(){ const root = G('fig'), F = DIM.fig, cn = DIM.can;
     const pcb = M(0x16181b, {roughness:.55}); const canM = M(0xc4c8c4, {metalness:.72, roughness:.34}); const dk = M(0x0d0f10, {roughness:.8});
     const blue = M(0x2b53b8, {roughness:.5}); const blk = M(0x1b1d1f, {roughness:.55}); const pin = M(0xc9cdcf, {metalness:.8, roughness:.3}); const ic = M(0x252728);
-    const flangeY = HT + 13, faceY = flangeY + .6 + FIG.legs;
-    let n = 0;
-    FIG.zs.forEach(z => [-1, 1].forEach(s => {
-      const canX = s*FIG.x, inner = canX - s*FIG.endOff, mid = inner + s*FIG.L/2, outer = inner + s*FIG.L;
-      B(g, FIG.L, FIG.T, FIG.W, pcb, mid, faceY, z);
-      cyl(g, FIG.flD/2, .6, canM, canX, flangeY, z, 36);
-      cyl(g, FIG.canD/2, FIG.canH - .6, canM, canX, flangeY - FIG.canH + .6, z, 36);
-      cyl(g, 1.6, .05, dk, canX, flangeY - FIG.canH + .55, z, 20);
-      for (let a = 0; a < 4; a++) cyl(g, .28, FIG.legs + FIG.T + .6, pin, canX + 2.55*Math.cos(a*1.57+.78), flangeY + .6, z + 2.55*Math.sin(a*1.57+.78), 8);
-      B(g, 7, 6.6, 7, blue, inner + s*19, faceY - 6.6, z);
-      B(g, 5, 1.6, 4, ic, inner + s*13, faceY - 1.6, z + 6);
-      B(g, 2.4, 2.4, 10.2, blk, outer - s*1.4, faceY - 2.4, z);
-      for (let i = 0; i < 4; i++) B(g, 9, .6, .6, pin, outer + s*4.2, faceY - 1.6, z + (i-1.5)*2.54);
-      B(g, 13, 2.6, 10.2, blk, outer + s*8.6, faceY - 2.6, z);
-      [[inner + s*3,z-7.5,flangeY,faceY],[inner + s*3,z+7.5,flangeY,faceY],[outer - s*3,z-7.5,HT,faceY],[outer - s*3,z+7.5,HT,faceY]].forEach(([x,zz,a,b]) => cyl(g, 1.7, b-a, brass.clone(), x, a, zz, 12));
-      const d = decal(g, 15, 5.4, canvasTex(28, 10, 8, drawFig(FIG.names[n++])), inner + s*21, faceY + FIG.T + .05, z);
-      d.rotation.z = -Math.PI/2;
-    }));
+    const flY = CH.yT, faceY = FIGY, names = ['TGS2600', 'TGS26xx'];
+    CAN.xs.forEach((cx, n) => { const g = new THREE.Group(); g.position.set(cx, 0, CAN.z); g.rotation.y = -Math.PI/2; root.add(g);   /* local +x = world +z */
+      const inner = -F.endOff, mid = inner + F.L/2, outer = inner + F.L;
+      B(g, F.L, F.T, F.W, pcb, mid, faceY, 0);
+      cyl(g, cn.flD/2, cn.flT, canM, 0, flY, 0, 36);
+      cyl(g, cn.bodyD/2, cn.h - cn.flT, canM, 0, flY - (cn.h - cn.flT), 0, 36);
+      cyl(g, 1.6, .05, dk, 0, flY - (cn.h - cn.flT) - .05, 0, 20);
+      for (let a = 0; a < 4; a++) cyl(g, cn.pinD/2, F.standoff + F.T + .6, pin, cn.pinPCD/2*Math.cos(a*1.5708 + .785), flY + cn.flT, cn.pinPCD/2*Math.sin(a*1.5708 + .785), 8);
+      B(g, 7, F.potH, 7, blue, inner + 19, faceY - F.potH, 0);
+      B(g, 5, 1.6, 4, ic, inner + 13, faceY - 1.6, 6);
+      B(g, 2.4, 2.4, 10.2, blk, outer - 1.4, faceY - 2.4, 0);
+      for (let i = 0; i < 4; i++) B(g, F.pins, .6, .6, pin, outer + F.pins/2 - .3, faceY - 1.6, (i - 1.5)*2.54);
+      B(g, F.conn - 1, 2.6, 10.2, blk, outer + 1.5 + (F.conn - 1)/2, faceY - 2.6, 0);
+      const d = decal(g, 15, 5.4, canvasTex(28, 10, 8, drawFig(names[n])), inner + 21, faceY + F.T + .05, 0); d.rotation.z = -Math.PI/2;
+    });
   })();
 
   /* 11 Hub PCB */
-  (function(){ const g = G('hub');
-    const s = new THREE.Shape(), a = 64, b = 61, r = 6, nw = 26, nz = 37;
-    s.moveTo(nw, -b); s.lineTo(a-r, -b); s.quadraticCurveTo(a,-b,a,-b+r); s.lineTo(a,b-r); s.quadraticCurveTo(a,b,a-r,b); s.lineTo(-a+r,b); s.quadraticCurveTo(-a,b,-a,b-r); s.lineTo(-a,-b+r); s.quadraticCurveTo(-a,-b,-a+r,-b); s.lineTo(-nw,-b); s.lineTo(-nw,-nz); s.lineTo(nw,-nz); s.closePath();
-    s.holes.push(circ(0, -28, 7)); s.holes.push(circ(0, 52, 3));
-    const eg = new THREE.ExtrudeGeometry(s, {depth:1.6, bevelEnabled:false, curveSegments:16}); eg.rotateX(-Math.PI/2);
-    const t = canvasTex(128, 122, 9, drawHub); t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping; t.repeat.set(1/128, 1/122); t.offset.set(.5, .5);
-    add(g, eg, [new THREE.MeshStandardMaterial({map:t, roughness:.5, metalness:.05}), M(0x18452f, {roughness:.55})], 0, 32, 0);
+  (function(){ const g = G('hub'), Hb = DIM.hub, a = Hb.W/2, b = Hb.D/2, e = DIM.esp, s = DIM.shut;
+    const sh = polyS([[-a,-b],[a,-b],[a,b],[Hb.cutX,b],[Hb.cutX,Hb.cutZ],[-a,Hb.cutZ]]); sh.holes.push(circ(OUT.x, -OUT.z, DIM.outlet.d/2));
+    const eg = new THREE.ExtrudeGeometry(sh, {depth:Hb.t, bevelEnabled:false, curveSegments:16}); eg.rotateX(-Math.PI/2);
+    const t = canvasTex(Hb.W, Hb.D, 9, drawHub); t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping; t.repeat.set(1/Hb.W, 1/Hb.D); t.offset.set(.5, .5);
+    add(g, eg, [new THREE.MeshStandardMaterial({map:t, roughness:.5, metalness:.05}), M(0x18452f, {roughness:.55})], 0, HT - Hb.t, 0);
     const blk = M(0x1c1f21, {roughness:.5}); const wht = M(0xece8dc, {roughness:.6}); const sil = M(0xc4c8cb, {metalness:.75, roughness:.32}); const fer = M(0x4a4d50, {roughness:.5}); const tan = M(0xb79b6a, {roughness:.6});
     const led = M(0x9be8b9, {emissive:0x2fbf6e, emissiveIntensity:.8});
     const y = HT;
-    B(g, 9.9, 3, 2.4, blk, 0, y, -8.89); B(g, 12.4, 3, 2.4, blk, 0, y, 8.89);
-    B(g, 2.5, 8.5, 38.6, blk, ESPX-11.43, y, ESPZ); B(g, 2.5, 8.5, 38.6, blk, ESPX+11.43, y, ESPZ);
-    [[-42,-24],[-42,-46]].forEach(([x,z]) => B(g, 6, 7, 10, wht, x, y, z));
-    [[40,5],[50,5]].forEach(([x,z]) => B(g, 8, 7, 6, wht, x, y, z));
-    B(g, 4, 1.2, 3.2, blk, 34, y, 27);          /* ADS1115 */
-    B(g, 8, 4, 8, fer, -34, y, 44);             /* boost inductor */
-    B(g, 4, 1, 4, blk, -50, y, 34);             /* charger */
-    B(g, 8, 3.2, 9, sil, -60, y, 30);           /* USB-C */
-    B(g, 7.4, 3.2, 3.4, sil, -62, y, 48);       /* switch */
-    B(g, 3.5, 1.6, 2.5, blk, 24, y, 40);        /* LDO */
-    B(g, 3.5, 1.2, 3, blk, 28, y, -24);         /* Q1 */
-    B(g, 2.8, 1, 1.5, blk, 22, y, -14);         /* D1 */
-    B(g, 2.8, 1, 1.5, blk, 20, y, 30);          /* Q2 */
-    cyl(g, 4, 7, sil, -22, y, 30, 20);          /* bulk cap */
-    B(g, 1.6, .8, .8, led, 30, y, 50);
-    [[30,27],[32,29],[38,31],[36,24]].forEach(([x,z]) => B(g, 1, .5, .5, tan, x, y, z));
-    /* underside connectors */
-    [[44,-8,8],[8,-26,8],[20,30,10]].forEach(([x,z,w]) => B(g, w, 4.2, 5, wht, x, 27.8, z));
-    HOLES.forEach(([x,z]) => cyl(g, 2.3, 1.3, sil, x, y, z, 20));
+    B(g, 2.4, 2.5, 9.9, blk, XS - s.rowGap/2, y, SH.z); B(g, 2.4, 2.5, 12.4, blk, XS + s.rowGap/2, y, SH.z);            /* J1 sockets */
+    [-1, 1].forEach(sd => B(g, 2.5, e.seat, e.pins*2.54, blk, e.x + sd*e.rowGap/2, y, e.z));                             /* ESP32-S3 sockets */
+    [[13,8],[25,8]].forEach(p => B(g, 10, 7, 6, wht, p[0], y, p[1]));                                                   /* J10, J11 */
+    B(g, 4, 1.2, 3.2, blk, 18, y, -4);            /* ADS1115 */
+    B(g, 8, 4, 8, fer, 20, y, -30);               /* boost inductor */
+    cyl(g, 4, 7, sil, 12, y, -44, 20);            /* bulk cap */
+    B(g, 3.5, 1.6, 2.5, blk, -52, y, -10);        /* sensor LDO */
+    B(g, 3.5, 1.2, 3, blk, 20, y, -52);           /* Q1 */
+    B(g, 2.8, 1, 1.5, blk, 26, y, -52);           /* D1 */
+    B(g, 2.8, 1, 1.5, blk, -54, y, 10);           /* Q2 */
+    B(g, 8, 7, 5, wht, -54, y, 2);                /* J22 servo */
+    B(g, 4, 1, 4, blk, 50, y, 44);                /* charger */
+    B(g, 9, 3.2, 8, sil, 59, y, 40);              /* USB-C */
+    B(g, 3.4, 3.2, 7.4, sil, 61.6, y, 24);        /* switch */
+    B(g, 1.6, .8, .8, led, 40, y, 56);
+    [[15,0],[21,0],[40,14],[42,16]].forEach(p => B(g, 1, .5, .5, tan, p[0], y, p[1]));
+    [[44,30,8],[26,-6,8]].forEach(p => B(g, p[2], 4.2, 5, wht, p[0], HT - Hb.t - 4.2, p[1]));                           /* J20, J21 on the underside */
+    HOLES.forEach(h => cyl(g, 2.3, 1.3, sil, h[0], y, h[1], 20));
   })();
 
-  /* 12 ESP32 devkit, laid along z with USB to the rear */
-  (function(){ const root = G('esp'); const g = new THREE.Group(); g.position.set(ESPX, 0, ESPZ); g.rotation.y = Math.PI/2; root.add(g);
-    const yb = HT + 11; const cz = 0, ox = -30;
+  /* 12 ESP32-S3 dev board, USB to the rear */
+  (function(){ const e = DIM.esp; const g = new THREE.Group(); g.position.set(e.x, 0, e.z); g.rotation.y = Math.PI/2; G('esp').add(g);
+    const yb = HT + e.seat, hl = e.L/2;
     const brd = M(0x15181a, {roughness:.5}); const blk = M(0x1c1f21); const sil = M(0xc4c8cb, {metalness:.75, roughness:.3}); const red = M(0xff8a7a, {emissive:0xd8352a, emissiveIntensity:.6});
-    B(g, 38.6, 2.5, 2.5, blk, 0, yb-2.5, cz-11.43); B(g, 38.6, 2.5, 2.5, blk, 0, yb-2.5, cz+11.43);
-    B(g, 51, 1.6, 25.5, brd, 0, yb, cz);
+    B(g, e.pins*2.54, 2.5, 2.5, blk, 0, yb - 2.5, -e.rowGap/2); B(g, e.pins*2.54, 2.5, 2.5, blk, 0, yb - 2.5, e.rowGap/2);
+    B(g, e.L, e.t, e.W, brd, 0, yb, 0);
     const mtop = new THREE.MeshStandardMaterial({map: canvasTex(25.5, 18, 20, drawModule), roughness:.5}); const mside = M(0x1d2124);
-    add(g, new THREE.BoxGeometry(25.5, .8, 18), [mside, mside, mtop, mside, mside, mside], 17.25+ox, yb + 2, cz);
+    add(g, new THREE.BoxGeometry(25.5, .8, 18), [mside, mside, mtop, mside, mside, mside], -hl + 12.75, yb + e.t + .4, 0);
     const ctop = new THREE.MeshStandardMaterial({map: canvasTex(17.6, 15.6, 20, drawCan), metalness:.7, roughness:.33}); const cside = M(0xc2c6c9, {metalness:.75, roughness:.3});
-    add(g, new THREE.BoxGeometry(17.6, 2.3, 15.6), [cside, cside, ctop, cside, cside, cside], 20.8+ox, yb + 3.55, cz);
-    B(g, 5.8, 2.6, 7.6, sil, 24.4, yb+1.6, cz);
-    B(g, 3.5, 1.5, 3, blk, 20, yb+1.6, cz-8); B(g, 3.5, 1.5, 3, blk, 20, yb+1.6, cz+8);
-    B(g, 5, .9, 5, blk, 12, yb+1.6, cz);
-    B(g, 1.6, .8, .8, red, 17.5, yb+1.6, cz+4);
+    add(g, new THREE.BoxGeometry(17.6, e.modH - .8, 15.6), [cside, cside, ctop, cside, cside, cside], -hl + 16.3, yb + e.t + .8 + (e.modH - .8)/2, 0);
+    B(g, 7.4, 3.2, 9, sil, hl - 3.2, yb + e.t, 0);
+    B(g, 3.5, 1.5, 3, blk, hl - 10, yb + e.t, -9); B(g, 3.5, 1.5, 3, blk, hl - 10, yb + e.t, 9);
+    B(g, 5, .9, 5, blk, 6, yb + e.t, 0);
+    B(g, 1.6, .8, .8, red, 12, yb + e.t, 5);
   })();
 
   /* 13 18650 cell */
-  (function(){ const g = G('batt'); const z = -11, y = 14;
+  (function(){ const b = DIM.batt; const g = new THREE.Group(); g.position.set(b.x, b.y0 - 3, b.z); G('batt').add(g); const y = 14;
     const hold = M(0x202325, {roughness:.65}); const met = M(0xc4c8cb, {metalness:.75, roughness:.3});
-    B(g, 77, 3, 21, hold, 0, 3, z); B(g, 2.4, 19, 21, hold, -37.3, 3, z); B(g, 2.4, 19, 21, hold, 37.3, 3, z);
-    B(g, 77, 8, 2, hold, 0, 3, z-10); B(g, 77, 8, 2, hold, 0, 3, z+10);
+    B(g, b.L, 3, b.W, hold, 0, 3, 0); B(g, 2.4, 19, b.W, hold, -b.L/2 + 1.2, 3, 0); B(g, 2.4, 19, b.W, hold, b.L/2 - 1.2, 3, 0);
+    B(g, b.L, 8, 2, hold, 0, 3, -b.W/2 + 1); B(g, b.L, 8, 2, hold, 0, 3, b.W/2 - 1);
     const c = new THREE.CylinderGeometry(9.3, 9.3, 69, 36); c.rotateZ(Math.PI/2);
     const t = canvasTex(58, 70, 6, drawBatt);
     const m = M(0xffffff, {map:t, roughness:.4}); const end = M(0x8f979b, {metalness:.7, roughness:.35});
-    add(g, c, [m, end, end], 0, y, z);
-    xc(g, 3, 34.5, 36.1, met, y, z, 18);
+    add(g, c, [m, end, end], 0, y, 0);
+    xc(g, 3, 34.5, 36.1, met, y, 0, 18);
   })();
 
-  /* 14 Restrictor and buffer */
-  (function(){ const g = G('rest'); const z = -52, y = 24;
-    const buf = clearM(.32, 0xf2c98a); const eg = new THREE.LineBasicMaterial({color:0x8c6a33, transparent:true, opacity:.8});
-    const box = B(g, 38, 24, 22, buf, -41, 4, -43);
-    const l = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(38, 24, 22)), eg); l.position.copy(box.position); g.add(l);
-    const body = M(0xdfe5e3, {roughness:.4}); const red = M(0xd8352a, {roughness:.35, transparent:true, opacity:.9}); const st = M(0xc9ced0, {metalness:.85, roughness:.25});
-    cyl(g, 2.8, HT - y, body, 0, y, z, 20);
-    xc(g, 3, 1.5, -3, body, y, z);
-    const hg = new THREE.CylinderGeometry(2.1, 3.2, 8, 20); hg.rotateZ(-Math.PI/2); add(g, hg, red, -7, y, z);
-    xc(g, .25, -11, -24, st, y, z, 10);
-    xc(g, 2.2, -22, -19, body, 12, -36);
+  /* 14 Restrictor block and buffer. The 25 G tip is inside the buffer. */
+  (function(){ const g = G('rest'), r = DIM.rest, b = DIM.buf; const body = alu();
+    const bs = polyS(rectP(BUF.bx0, BUF.x0, OUT.z - r.face/2, OUT.z + r.face/2)); bs.holes.push(circ(OUT.x, -OUT.z, 1));
+    extr(g, bs, HT - DIM.hub.t - r.y0, body, r.y0);
+    const t = new THREE.TorusGeometry(3, .75, 10, 24); t.rotateX(Math.PI/2); add(g, t, sealM, OUT.x, HT - DIM.hub.t - .35, OUT.z);
+    const bufM = clearM(.3, 0xc9d3d6); const eg = new THREE.LineBasicMaterial({color:0x6d787c, transparent:true, opacity:.85});
+    const box = B(g, b.L, b.od, b.od, bufM, (BUF.x0 + BUF.x1)/2, b.yc - b.od/2, OUT.z);
+    const l = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(b.L, b.od, b.od)), eg); l.position.copy(box.position); g.add(l);
+    B(g, b.plate, b.od, b.plateZ, body, BUF.x1 + b.plate/2, b.yc - b.od/2, OUT.z);
+    [-1, 1].forEach(sd => xc(g, 1.4, BUF.x0, BUF.xp + 1.4, scrM, b.yc, OUT.z + sd*(b.plateZ/2 - 2.2), 10));
+    xc(g, 2.5, BUF.xp, BUF.xb, brass.clone(), b.yc, OUT.z, 16);
+    xc(g, 2, BUF.x0, BUF.x0 + r.luer, ppS, b.yc, OUT.z, 16);
+    const x0 = BUF.x0 + r.luer - DIM.liner.engage;
+    const hg = new THREE.CylinderGeometry(2.1, 3.2, r.hubL, 20); hg.rotateZ(-Math.PI/2); add(g, hg, M(0xd8352a, {roughness:.35}), x0 + r.hubL/2, b.yc, OUT.z);
+    xc(g, .3, x0 + r.hubL, x0 + r.hubL + r.needleL, M(0xc9ced0, {metalness:.85, roughness:.25}), b.yc, OUT.z, 10);
   })();
 
-  /* 15 Pump. Datasheet: head Ø27 × 27.3, overall 45.3, motor Ø24, nozzle 6.1 long */
-  (function(){ const g = G('pump'); const y = 17.5, z = -44, x0 = 6;
-    const cream = M(0xeee6d0, {roughness:.55}); const blk = M(0x1b1c1d, {roughness:.5}); const can = M(0xb4bdc6, {metalness:.72, roughness:.3}); const tab = M(0xc9b47a, {metalness:.8, roughness:.3}); const foam = M(0x3b3f41, {roughness:1});
-    xc(g, 12, x0, x0+18, can, y, z);
-    xc(g, 13.5, x0+18, x0+27, cream, y, z);
-    xc(g, 13.6, x0+27, x0+28.4, blk, y, z);
-    xc(g, 13.5, x0+28.4, x0+37.5, cream, y, z);
-    xc(g, 13.6, x0+37.5, x0+38.6, blk, y, z);
-    xc(g, 13.5, x0+38.6, x0+45.3, cream, y, z);
-    xc(g, 2.15, x0+45.3, x0+51.4, cream, y, z, 16);
-    zc(g, 2.15, z+13, z+18, cream, x0+22, y, 16);
-    [[-5,0],[5,0]].forEach(([d]) => B(g, 4, .4, 1.6, tab, x0-2, y+d, z));
-    B(g, 44, 1, 26, foam, x0+24, 3, z);
-    [x0+9, x0+33].forEach(x => { const t = new THREE.TorusGeometry(x < x0+18 ? 13 : 14.5, 1.1, 10, 36, Math.PI); t.rotateY(Math.PI/2); t.rotateX(Math.PI); add(g, t, foam, x, y, z); });
+  /* 15 Pump, along z, end nipple to the rear. Datasheet: head Ø27 × 27.3, motor Ø24, 45.3 body, 6.1 nipple */
+  (function(){ const g = G('pump'), p = DIM.pump, x = PUMP.x, y = PUMP.y, hr = p.headD/2, z0 = PUMP.zEnd, z1 = PUMP.zHead;
+    const cream = M(0xeee6d0, {roughness:.55}); const blk = M(0x1b1c1d, {roughness:.5}); const can = M(0xb4bdc6, {metalness:.72, roughness:.3}); const tab = M(0xc9b47a, {metalness:.8, roughness:.3}); const tpu = M(0x3b3f41, {roughness:1});
+    zc(g, p.motorD/2, z1, PUMP.zMot, can, x, y);
+    zc(g, hr, z1 - 9, z1, cream, x, y); zc(g, hr + .1, z1 - 10.4, z1 - 9, blk, x, y); zc(g, hr, z1 - 19.5, z1 - 10.4, cream, x, y); zc(g, hr + .1, z1 - 20.6, z1 - 19.5, blk, x, y); zc(g, hr, z0, z1 - 20.6, cream, x, y);
+    zc(g, p.nipD/2, PUMP.zNip, z0, cream, x, y, 16);
+    xc(g, p.portD/2, PUMP.portX, x - hr + 1, cream, y, OUT.z, 16);
+    [-5, 5].forEach(d => B(g, 1.6, .4, p.tab, tab, x, y + d, PUMP.zMot + p.tab/2));
+    [[PUMP.zMot - 9, p.motorD/2], [z0 + 8, hr]].forEach(q => { const t = new THREE.TorusGeometry(q[1] + .7, .7, 10, 36, Math.PI); t.rotateZ(Math.PI); add(g, t, tpu, x, y, q[0]); B(g, 30, y - q[1] - E.wall, 3, tpu, x, E.wall, q[0]); });
   })();
 
-  /* Flexible runs: tube geometry follows the parts as they explode */
-  const silicone = new THREE.MeshStandardMaterial({color:0xe9ecea, roughness:.5, transparent:true, opacity:.82});
-  const fep = new THREE.MeshStandardMaterial({color:0xd7eef5, roughness:.2, transparent:true, opacity:.6});
-  const cols = {red:M(0xc73a30), blk:M(0x1a1b1c), yel:M(0xdcb02f), org:M(0xd97a24), brn:M(0x6e4a2c), blu:M(0x2a62b8)};
+  /* 16 Tubes: swept along splines. They follow the parts when you explode the model. Color = material. */
+  const pfaM = new THREE.MeshStandardMaterial({color:0x3fb4dc, roughness:.25, transparent:true, opacity:.85});
+  const silM = new THREE.MeshStandardMaterial({color:0xefe7cf, roughness:.55, transparent:true, opacity:.92});
+  const cols = {red:M(0xc73a30), blk:M(0x1a1b1c), yel:M(0xdcb02f), org:M(0xd97a24), brn:M(0x6e4a2c)};
   const flex = [];
-  function run(group, a, b, pts, r, mat){ const m = new THREE.Mesh(new THREE.BufferGeometry(), mat); G(group).add(m); flex.push({m, a:byId[a], b:byId[b], p:pts.map(q => new THREE.Vector3().fromArray(q)), r}); }
-  [-1, 1].forEach(s => { const id = s < 0 ? 'noseS' : 'noseR'; const x = s*NX;
-    run('tubes', id, 'valve', [[x,AY,38],[x,AY,34],[s*12,AY,29],[s*9.6,AY,28]], 2.4, fep); });
-  run('tubes', 'chamber', 'rest', [[0,HT+.2,-52],[0,31,-52]], 2.4, fep);
-  run('tubes', 'rest', 'pump', [[-20,12,-36],[-14,10,-30],[0,10,-27],[20,13,-26],[28,17.5,-26.3]], 2.5, silicone);
-  run('tubes', 'pump', 'tray', [[57.2,17.5,-44],[60.5,17.5,-46],[55,17.5,-54],[55,17.5,-62.4]], 2.5, silicone);
-  /* Figaro wires: three per module */
-  (function(){ const faceY = HT + 13 + .6 + FIG.legs, wy = faceY - 1.3, tip = FIG.x - FIG.endOff + FIG.L + 15; const wc = ['red','blk','yel'];
-    FIG.zs.forEach((z, r) => {
-      wc.forEach((c, i) => { const d = (i-1)*2.54;
-        run('wires', 'fig', 'hub', [[-tip,wy,z+d],[-tip-3,wy-1,z+d],[-tip-3,wy-7,z+d*.8],[-46,HT+12,z+d*.8],[-42,HT+7.2,z+d*.8]], .55, cols[c]);
-        const jx = r === 0 ? 40 : 50;
-        run('wires', 'fig', 'hub', [[tip,wy,z+d],[tip+2,wy-.5,z+d],[tip+4,wy-1.5,z+d*.7+2],[56+r*2,wy-2,-8+d*.6],[jx+4,HT+11,1],[jx+d*.8,HT+7.2,5]], .55, cols[c]);
-      });
-    }); })();
-  run('wires', 'pump', 'hub', [[4,20,-44],[2,26,-41],[5,28.6,-34],[6.5,28,-26]], .6, cols.red);
-  run('wires', 'pump', 'hub', [[4,15,-44],[0,22,-38],[6,27,-31],[9.5,28,-26]], .6, cols.blk);
-  run('wires', 'batt', 'hub', [[36.5,16,-9],[42,18,-9],[44,24,-8.4],[43,28,-8]], .7, cols.red);
-  run('wires', 'batt', 'hub', [[36.5,12,-13],[43,15,-12],[46,24,-10],[45.5,28,-8]], .7, cols.blk);
-  [['org',-1.6],['red',0],['brn',1.6]].forEach(([c,d]) => run('wires', 'servo', 'hub', [[6.2,12,43+d*.2],[12,12+d*.6,44],[19,20,40],[20+d,26,31],[20+d,28,30]], .5, cols[c]));
+  function run(group, a, b, pts, r, mat, vt){ const m = new THREE.Mesh(new THREE.BufferGeometry(), mat); G(group).add(m); const f = {m:m, a:byId[a], b:byId[b], p:pts.map(q => new THREE.Vector3().fromArray(q)), r:r, vt:vt || null}; flex.push(f); return f; }
+  (function(){ const hz = VT.ham.zv, hb = DIM.ham.body/2, ex = XC - DIM.elbow.w/2, rp = DIM.fit.tubeOD/2, rs = DIM.sil.od/2;
+    run('tubes', 'valve', 'chamber', [[XS,AY,hz-hb],[XS,AY,(hz-hb+CH.zF)/2],[XS,AY,CH.zF]], rp, pfaM, 'ham');
+    run('tubes', 'valve', 'noseR', [[XS+hb,AY,hz],[(XS+hb+ex)/2,AY,hz],[ex,AY,hz]], rp, pfaM, 'ham');
+    byId.tubes.ancF = run('tubes', 'rest', 'pump', [[BUF.xp+.5,BUF.y,OUT.z],[BUF.xb,BUF.y,OUT.z],[PUMP.portX+1,PUMP.y,OUT.z],[PUMP.portX+DIM.pump.portL-.5,PUMP.y,OUT.z]], rs, silM);
+    run('tubes', 'pump', 'tray', [[PUMP.x,PUMP.y,PUMP.zEnd-.5],[PUMP.x,PUMP.y,PUMP.zNip],[PUMP.x,PUMP.y,-E.D/2+E.wall]], rs, silM);
+  })();
+  /* 17 Wires */
+  (function(){ const F = DIM.fig, wy = FIGY - 1.3, tip = CAN.z - F.endOff + F.L + F.conn; const wc = ['red','blk','yel'];
+    CAN.xs.forEach((cx, n) => { const jx = n ? 25 : 13;
+      wc.forEach((c, i) => { const d = (i-1)*2.54; const f = run('wires', 'fig', 'hub', [[cx+d,wy,tip],[cx+d,wy-1,tip+3],[cx+d*.8+4,wy-6,tip+4],[jx+d*.8-4,HT+13,14],[jx+d*.8,HT+7.2,8]], .55, cols[c]); if (!n && !i) byId.wires.ancF = f; }); });
+    run('wires', 'pump', 'hub', [[PUMP.x,PUMP.y+5,PUMP.zTab],[PUMP.x-4,PUMP.y+8,PUMP.zTab+5],[34,HT-5,-4],[27.5,HT-DIM.hub.t-4,-6]], .6, cols.red);
+    run('wires', 'pump', 'hub', [[PUMP.x,PUMP.y-5,PUMP.zTab],[PUMP.x-6,PUMP.y,PUMP.zTab+6],[34,HT-8,-2],[24.5,HT-DIM.hub.t-4,-6]], .6, cols.blk);
+    const b = DIM.batt;
+    run('wires', 'batt', 'hub', [[b.x+b.L/2-2,b.y0+13,b.z+2],[b.x+b.L/2-4,b.y0+21,b.z-2],[50,HT-6,b.z-8],[45.5,HT-DIM.hub.t-4,30]], .7, cols.red);
+    run('wires', 'batt', 'hub', [[b.x-b.L/2+2,b.y0+13,b.z-2],[b.x-b.L/2+8,b.y0+21,b.z-6],[38,HT-6,b.z-9],[42.5,HT-DIM.hub.t-4,30]], .7, cols.blk);
+    ['med','ham'].forEach(id => { const v = VT[id], xv = XS - DIM.gear.cc, zb = v.bz - v.dir*DIM.servo.L/2;
+      [['org',-1.6],['red',0],['brn',1.6]].forEach(q => run('wires', 'servo', 'hub', [[xv+q[1],v.servoBase+3,zb],[xv-8+q[1],v.servoBase+1,zb-v.dir*4],[-54+q[1],HT+12,14],[-54+q[1],HT+7.2,2]], .5, cols[q[0]], id)); });
+  })();
 
-  byId.tubes.ancF = flex[0]; byId.wires.ancF = flex[5];
   let lastE = -1;
   function updateFlex(){
     if (Math.abs(state.e - lastE) < 1e-4) return; lastE = state.e;
     const pA = new THREE.Vector3(), pts = [];
     flex.forEach(f => { pts.length = 0; const n = f.p.length;
       f.p.forEach((q, i) => { const w = n > 1 ? i/(n-1) : 0; pA.copy(q).addScaledVector(f.a.offV, state.e*(1-w)).addScaledVector(f.b.offV, state.e*w); pts.push(pA.clone()); });
-      const seg = Math.max(10, n*5); const g = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, false, 'centripetal'), seg, f.r, 7, false);
+      const seg = Math.max(10, n*5); const g = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, false, 'centripetal'), seg, f.r, 8, false);
       f.m.geometry.dispose(); f.m.geometry = g; });
   }
+  function applyVT(){
+    ['med','ham'].forEach(id => vtObjs[id].forEach(o => { o.visible = state.vt === id; }));
+    flex.forEach(f => { f.m.visible = !f.vt || f.vt === state.vt; });
+    gR.position.z = VT[state.vt].zv - VT.ham.zv;
+    lineKey = '';
+  }
 
-  /* Airflow particles */
-  const tail = [[0,AY,28],[0,AY,20],[0,AY,14],[-5,40,8],[5,41.8,-2],[-6,41,-11],[7,40,-20],[-7,37,-28],[7,36,-37],[-6,36.5,-44],[0,36,-51],[0,31,-52],[0,25,-52],[-9,24,-52],[-22,24,-52],[-34,20,-46],[-24,12,-37],[-14,10,-30],[0,10,-27],[20,13,-26],[28,17.5,-27],[28,17.5,-36],[42,17.5,-44],[57,17.5,-44],[60.5,17.5,-46],[55,17.5,-54],[55,17.5,-63],[55,17.5,-92]];
-  const mkCurve = s => new THREE.CatmullRomCurve3([[s*NX,AY,118],[s*NX,AY,94],[s*NX,AY,72],[s*NX,AY,42],[s*NX,AY,34],[s*12,AY,29],[s*7,AY,28]].concat(tail).map(a => new THREE.Vector3(a[0], a[1], a[2])), false, 'centripetal');
-  const curves = {samp:mkCurve(-1), ref:mkCurve(1)};
-  const N = 120; const pArr = new Float32Array(N*3); const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute('position', new THREE.BufferAttribute(pArr, 3));
-  const seeds = []; for (let i = 0; i < N; i++) seeds.push({p: i/N, a: Math.random()*2-1, b: Math.random()*2-1, c:Math.random()});
+  /* Airflow: arrows move along the centre line of the real air path for the selected valve type and state */
+  function pathPts(id, which){ const v = VT[id], yb = BUF.y, nl = DIM.noseR.len;
+    const head = which === 'samp'
+      ? [[XS,AY,MOUTH_S+34],[XS,AY,MOUTH_S+8],[XS,AY,MOUTH_S-6],[XS,AY,VT.bottomZ-4],[XS,AY,v.zv+6],[XS,AY,v.zv-6]]
+      : [[XC,AY,v.cartZ+nl+34],[XC,AY,v.cartZ+nl+8],[XC,AY,v.cartZ+6],[XC,AY,v.zv+9],[XC-1.5,AY,v.zv+1.5],[XC-8,AY,v.zv],[XS+8,AY,v.zv],[XS+1.5,AY,v.zv-1.5],[XS,AY,v.zv-8]];
+    const tail = [[XS,AY,CH.zF],[XS,AY+.4,CH.pF-1],[XS,SH.yT+2,SH.zF],[XS,SH.yT+2,SH.zR],[XS,AY,CAN.z+3],[XS,AY-1,CAN.z-2],[XS,HT+2.5,OUT.z+.5],[XS,HT-4,OUT.z],[XS,yb+6,OUT.z],[XS+1.5,yb+1.5,OUT.z],[XS+8,yb,OUT.z],
+      [BUF.x1,yb,OUT.z],[BUF.xb,yb,OUT.z],[PUMP.portX,PUMP.y,OUT.z],[PUMP.x-7,PUMP.y,OUT.z],[PUMP.x-1.5,PUMP.y,OUT.z-1.5],[PUMP.x,PUMP.y,OUT.z-8],[PUMP.x,PUMP.y,PUMP.zEnd],[PUMP.x,PUMP.y,-E.D/2],[PUMP.x,PUMP.y,-E.D/2-28]];
+    return head.concat(tail).map(a => new THREE.Vector3(a[0], a[1], a[2])); }
+  const curves = {}, lines = {};
+  ['med','ham'].forEach(id => { curves[id] = {}; lines[id] = {}; ['samp','ref'].forEach(w => { const c = new THREE.CatmullRomCurve3(pathPts(id, w), false, 'centripetal'); curves[id][w] = c; lines[id][w] = c.getSpacedPoints(260); }); });
+  const NA = 36; const arrowM = new THREE.MeshBasicMaterial({transparent:true, opacity:0, depthTest:false, depthWrite:false});
+  const coneG = new THREE.ConeGeometry(1.5, 4.6, 10); coneG.rotateX(Math.PI/2);
+  const arrows = []; for (let i = 0; i < NA; i++){ const m = new THREE.Mesh(coneG, arrowM); m.frustumCulled = false; m.renderOrder = 6; m.visible = false; scene.add(m); arrows.push(m); }
+  /* Hold: points that stay in the sealed chamber */
+  const N = 70; const pArr = new Float32Array(N*3); const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute('position', new THREE.BufferAttribute(pArr, 3));
+  const seeds = []; for (let i = 0; i < N; i++) seeds.push({a: Math.random()*2-1, b: Math.random(), c:Math.random()});
   const sprite = (function(){ const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'); const gr = g.createRadialGradient(32,32,0,32,32,32); gr.addColorStop(0,'rgba(255,255,255,1)'); gr.addColorStop(.45,'rgba(255,255,255,.85)'); gr.addColorStop(1,'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0,0,64,64); return new THREE.CanvasTexture(c); })();
-  const pMat = new THREE.PointsMaterial({size:4.6, map:sprite, transparent:true, depthWrite:false, depthTest:false, opacity:0});
+  const pMat = new THREE.PointsMaterial({size:4, map:sprite, transparent:true, depthWrite:false, depthTest:false, opacity:0});
   const pts = new THREE.Points(pGeo, pMat); pts.frustumCulled = false; pts.renderOrder = 5; scene.add(pts);
   const pLineMat = new THREE.LineBasicMaterial({transparent:true, opacity:0, depthTest:false});
   const pLine = new THREE.Line(new THREE.BufferGeometry(), pLineMat); pLine.frustumCulled = false; pLine.renderOrder = 4; scene.add(pLine);
-  const lines = {samp:curves.samp.getSpacedPoints(220), ref:curves.ref.getSpacedPoints(220)};
   let lineKey = '';
-  const tmp2 = new THREE.Vector3(); let time = 0;
-  function updParticles(){
-    const v = VALVE[state.valve].air;
-    if (v === 'hold'){
-      for (let i = 0; i < N; i++){ const s = seeds[i]; pArr[i*3] = s.a*15; pArr[i*3+1] = 37.5 + s.b*4 + .3*Math.sin(time*1.1 + i); pArr[i*3+2] = -22 + (s.c-.5)*66 + .5*Math.cos(time*.8 + i); }
-    } else {
-      const c = curves[v];
-      for (let i = 0; i < N; i++){ const s = seeds[i]; const t = (s.p + time*.085) % 1; c.getPointAt(t, tmp2); const w = Math.max(0, Math.min(1, (tmp2.z < 15 && tmp2.z > -56 && tmp2.y > 34) ? 1 : .18)); pArr[i*3] = tmp2.x + s.a*5.5*w; pArr[i*3+1] = tmp2.y + s.b*2.6*w; pArr[i*3+2] = tmp2.z; }
-    }
-    pGeo.attributes.position.needsUpdate = true;
-    if (lineKey !== v){ lineKey = v; pLine.visible = v !== 'hold'; if (v !== 'hold') pLine.geometry.setFromPoints(lines[v]); }
+  const tmp2 = new THREE.Vector3(), tmp3 = new THREE.Vector3(); let time = 0;
+  function updFlow(on){
+    const v = VALVE[state.valve].air, hold = v === 'hold';
+    pts.visible = on && hold;
+    if (pts.visible){ for (let i = 0; i < N; i++){ const s = seeds[i]; pArr[i*3] = XS + s.a*(DIM.ch.wShut/2 - 2); pArr[i*3+1] = HT + 1.5 + s.b*(DIM.ch.pocketH - 3) + .3*Math.sin(time*1.1 + i); pArr[i*3+2] = CH.pR + 2 + s.c*(CH.pF - CH.pR - 4) + .5*Math.cos(time*.8 + i); } pGeo.attributes.position.needsUpdate = true; }
+    const c = hold ? null : curves[state.vt][v];
+    arrows.forEach((m, i) => { m.visible = on && !!c; if (!m.visible) return; const t = (i/NA + time*.045) % 1; c.getPointAt(t, tmp2); c.getTangentAt(t, tmp3); m.position.copy(tmp2); m.lookAt(tmp3.add(tmp2)); });
+    const key = state.vt + v; if (lineKey !== key){ lineKey = key; if (!hold) pLine.geometry.setFromPoints(lines[state.vt][v]); }
+    pLine.visible = on && !hold;
   }
-  updParticles();
+  applyVT(); updFlow(false);
 
   /* Theme */
   let grid = null; let airC = new THREE.Color(), odorC = new THREE.Color();
-  function setAirColor(){ const c = VALVE[state.valve].air === 'samp' ? odorC : airC; pMat.color.copy(c); pLineMat.color.copy(c); }
+  function setAirColor(){ const c = VALVE[state.valve].air === 'samp' ? odorC : airC; pMat.color.copy(c); pLineMat.color.copy(c); arrowM.color.copy(c); }
   function applyTheme(){
     const cs = getComputedStyle(document.documentElement); const v = n => cs.getPropertyValue(n).trim();
     renderer.setClearColor(new THREE.Color(v('--stage') || '#dce3df'), 1);
@@ -815,19 +1165,26 @@ function build3D(){
   /* Selection look */
   const eachMat = (o, fn) => { if (!o.material) return; (Array.isArray(o.material) ? o.material : [o.material]).forEach(fn); };
   PARTS.forEach(p => p.group.traverse(o => eachMat(o, m => { if (m.userData.op0 === undefined){ m.userData.op0 = m.opacity; m.userData.tr0 = m.transparent; m.userData.dw0 = m.depthWrite; } })));
+  PARTS.forEach(p => p.group.traverse(o => eachMat(o, m => { if (m.userData.side0 === undefined) m.userData.side0 = m.side; })));
   const SHELL = {lid:.1, tray:.12, shroud:.22, chamber:.32};
   const AIRDIM = {hub:.28, fig:.4, esp:.35, batt:.5, servo:.5, bme:.9};
   const WIRED = {hub:1, wires:1, fig:1, bme:1, esp:1, batt:1, pump:1, servo:1};
+  const WIREDIM = {esp:.22};
   function applyLook(){
     PARTS.forEach(p => {
       const dim = state.sel && state.sel !== p.id;
       const see = (state.see || state.air || state.wire) && SHELL[p.id];
       let f = (see ? SHELL[p.id] : 1) * (dim ? .1 : 1);
       if (state.wire && !WIRED[p.id] && !see) f *= .16;
+      if (state.wire && WIREDIM[p.id]) f *= WIREDIM[p.id];
       if (state.air && AIRDIM[p.id]) f *= AIRDIM[p.id];
       p.group.traverse(o => { let eop = 1; eachMat(o, m => { const u = m.userData; if (u.op0 === undefined) return; const op = u.op0 * f; m.opacity = op; const tr = op < .999 || u.tr0; if (m.transparent !== tr){ m.transparent = tr; m.needsUpdate = true; } m.depthWrite = op < .999 ? false : u.dw0; eop = op; }); o.userData.eop = eop; });
     });
   }
+  /* Section view: a clipping plane through the sample air path (x = sample axis). The arrows are not clipped. */
+  renderer.localClippingEnabled = true;
+  const secPlane = new THREE.Plane(new THREE.Vector3(1, 0, 0), -XS);
+  function applySection(){ PARTS.forEach(p => p.group.traverse(o => eachMat(o, m => { m.clippingPlanes = state.sec ? [secPlane] : null; m.side = state.sec ? THREE.DoubleSide : m.userData.side0; m.needsUpdate = true; }))); }
 
   /* Picking */
   const ray = new THREE.Raycaster(); ray.params.Line.threshold = .8; const ndc = new THREE.Vector2(); let down = null;
@@ -879,12 +1236,13 @@ function build3D(){
     updateFlex();
     const target = VALVE[state.valve].a; const dv = target - state.va;
     if (dv !== 0){ state.va += reduce ? dv : Math.sign(dv)*Math.min(Math.abs(dv), dt*5.5); }
-    plug.rotation.y = state.va; horn.rotation.y = state.va;
+    plugs.forEach(p => { p.rotation.y = state.va; }); spinS.forEach(p => { p.rotation.y = -state.va; });
     const open = VALVE[state.valve].air;
     glows.noseS.opacity = (open === 'samp' ? 1 : .18) * (state.see ? .8 : 1); glows.noseR.opacity = (open === 'ref' ? 1 : .18) * (state.see ? .8 : 1);
     const aop = state.air ? Math.max(0, 1 - state.e*3.5) : 0;
-    pMat.opacity = aop; pLineMat.opacity = aop*.4; pts.visible = aop > .01; if (lineKey !== 'hold' && aop > .01) pLine.visible = true; else if (aop <= .01) pLine.visible = false;
-    if (pts.visible){ if (!reduce) time += dt; updParticles(); }
+    pMat.opacity = aop; pLineMat.opacity = aop*.35; arrowM.opacity = aop;
+    if (aop > .01 && !reduce) time += dt;
+    updFlow(aop > .01);
     if (state.cycle >= 0 && !reduce){ state.cycleT += dt; if (state.cycleT >= PHASES[state.cycle].s/10){ state.cycleT = 0; nextPhase(); } }
     controls.autoRotate = state.spin; controls.update();
     renderer.render(scene, camera);
@@ -892,53 +1250,76 @@ function build3D(){
   }
   function frame(){ step(Math.min(clock.getDelta(), .05)); requestAnimationFrame(frame); }
   requestAnimationFrame(frame);
-  return {applyLook, fit, setAirColor, camera, controls, step, parts:PARTS};
+  return {applyLook, applySection, applyVT, fit, setAirColor, camera, controls, step, parts:PARTS, renderer, scene};
 }
 
 /* ---------- UI ---------- */
 let gl = null;
+function partInfo(p){ return p.id === 'valve' ? Object.assign({}, p, VTINFO[state.vt]) : p; }
 function syncUI(){
   $('explode').value = Math.round(state.eT*100); $('explodeOut').textContent = Math.round(state.eT*100) + '%';
   $('btnAsm').setAttribute('aria-pressed', String(state.eT === 0)); $('btnExp').setAttribute('aria-pressed', String(state.eT === 1));
-  [['tSee','see'],['tAir','air'],['tWire','wire'],['tBal','balls'],['tSpin','spin']].forEach(([id,k]) => $(id).setAttribute('aria-pressed', String(state[k])));
+  [['tSee','see'],['tAir','air'],['tSec','sec'],['tWire','wire'],['tBal','balls'],['tSpin','spin']].forEach(([id,k]) => $(id).setAttribute('aria-pressed', String(state[k])));
   [['vRef','ref'],['vHold','hold'],['vSamp','samp']].forEach(([id,v]) => $(id).setAttribute('aria-pressed', String(state.valve === v)));
+  [['ytMed','med'],['ytHam','ham']].forEach(([id,v]) => $(id).setAttribute('aria-pressed', String(state.vt === v)));
 }
 function setValve(v){ state.valve = v; if (gl) gl.setAirColor(); syncUI(); if (!state.sel) renderDetail(); }
+function setVT(v){ state.vt = v; if (gl) gl.applyVT(); syncUI(); renderCalc(); renderDetail(); }
 function nextPhase(){ state.cycle += 1; if (state.cycle >= PHASES.length){ state.cycle = -1; setValve('ref'); return; } setValve(PHASES[state.cycle].v); }
 function runCycle(){ if (state.cycle >= 0){ state.cycle = -1; renderDetail(); return; } state.air = true; state.eT = 0; if (gl){ gl.applyLook(); gl.fit(); } state.cycleT = 0; state.cycle = 0; setValve(PHASES[0].v); }
 function toggleAir(){ state.air = !state.air; if (state.air) state.eT = 0; if (gl){ gl.applyLook(); if (state.air) gl.fit(); } syncUI(); if (!state.sel) renderDetail(); }
 function renderDetail(){
-  const d = $('detail'); const p = state.sel && byId[state.sel];
-  if (!p){
+  const d = $('detail'); const p0 = state.sel && byId[state.sel];
+  if (!p0){
     const v = VALVE[state.valve];
-    d.innerHTML = '<p class="eyebrow">Air path · valve position</p><h3>' + v.title + '</h3>' +
+    d.innerHTML = '<p class="eyebrow">Air path · valve position · ' + VT[state.vt].name + '</p><h3>' + v.title + '</h3>' +
       '<ol class="flow">' + v.flow.map(s => '<li>' + s + '</li>').join('') + '</ol><p>' + v.text + '</p>' +
       '<ol class="phases" aria-label="Sniff cycle, starting durations">' + PHASES.map((ph,i) => '<li class="' + (state.cycle === i ? 'now' : '') + '"><b>' + ph.label + '</b>' + ph.s + ' s</li>').join('') + '</ol>' +
       '<div class="btnrow"><button type="button" class="btn" id="dCyc">' + (state.cycle >= 0 ? 'Stop cycle' : 'Play sniff cycle') + '</button>' +
       '<button type="button" class="btn ghost" id="dAir">' + (state.air ? 'Hide airflow' : 'Show airflow') + '</button></div>' +
-      '<p class="hint-s">Tap a part or a balloon for its details. The cycle plays at 10× speed.</p>';
+      '<p class="hint-s">Tap a part or a balloon for its details and its source tag. The cycle plays at 10× speed.</p>';
     $('dAir').addEventListener('click', toggleAir); $('dCyc').addEventListener('click', runCycle); return;
   }
+  const p = partInfo(p0);
   d.innerHTML = '<p class="eyebrow">Item ' + p.n + '</p><h3>' + p.name + '</h3>' +
-    '<dl class="kv"><div><dt>Size (mm)</dt><dd>' + p.size + '</dd></div><div><dt>Qty</dt><dd>' + p.qty + '</dd></div><div><dt>Source</dt><dd><span class="src ' + p.src + '">' + SRC[p.src] + '</span></dd></div></dl>' +
+    '<dl class="kv"><div><dt>Size (mm)</dt><dd>' + p.size + '</dd></div><div><dt>Qty</dt><dd>' + p.qty + '</dd></div><div><dt>Material</dt><dd>' + p.mat + '</dd></div><div><dt>Source tag</dt><dd><span class="src ' + p.src + '">' + SRC[p.src] + '</span></dd></div></dl>' +
     '<p>' + p.text + '</p><button type="button" class="btn ghost" id="dClear">Clear selection</button>';
   $('dClear').addEventListener('click', () => select(null));
 }
 function select(id){
   state.sel = id || null;
-  PARTS.forEach(p => { if (p.row) p.row.classList.toggle('sel', p.id === state.sel); });
+  PARTS.forEach(p => (p.rows || []).forEach(r => r.classList.toggle('sel', p.id === state.sel)));
   if (gl) gl.applyLook();
   renderDetail();
 }
+function renderCalc(){
+  const c = calc(state.vt), f = (x, n) => x.toFixed(n === undefined ? 1 : n);
+  const rows = [
+    ['Flow', DIM.flow + ' mL/min'],
+    ['Chamber volume, net', '≈ ' + f(c.net) + ' mL'],
+    ['Time for one air change', '≈ ' + f(c.tChange) + ' s'],
+    ['Time to 95% new air', '≈ ' + f(c.t95) + ' s'],
+    ['Upstream volume behind the filter', '≈ ' + f(c.behind, 2) + ' mL'],
+    ['Upstream volume, nostril mouth to chamber', '≈ ' + f(c.upstream, 2) + ' mL'],
+    ['Upstream tube, sample side', f(c.tubeUp) + ' mm'],
+    ['Carbon bed', '≈ ' + f(c.bed) + ' mL, ' + f(c.carbon) + ' g'],
+    ['Carbon contact time', '≈ ' + f(c.tCarbon) + ' s'],
+    ['Average power (estimate)', '≈ 1.8 W'],
+    ['Runtime on one 18650 (estimate)', '≈ 6 h']];
+  $('calcBody').innerHTML = rows.map(r => '<tr><td>' + r[0] + '</td><td class="mono">' + r[1] + '</td></tr>').join('');
+}
 
 const tb = $('bomBody');
-PARTS.forEach(p => {
-  const tr = document.createElement('tr'); tr.tabIndex = 0;
-  tr.innerHTML = '<td><span class="ball">' + p.n + '</span></td><td class="pname">' + p.name + '</td><td class="mono">' + p.qty + '</td><td class="mono">' + p.size + '</td><td><span class="src ' + p.src + '">' + SRC[p.src] + '</span></td>';
+bomRows().forEach(r => {
+  const p = byId[r[1]]; const tr = document.createElement('tr'); tr.tabIndex = 0;
+  tr.innerHTML = '<td><span class="ball">' + r[0] + '</span></td><td class="pname">' + r[2] + '</td><td class="mono">' + r[3] + '</td><td class="mono">' + r[4] + '</td><td class="matc">' + r[5] + '</td><td><span class="src ' + r[6] + '">' + SRC[r[6]] + '</span></td>';
   tr.addEventListener('click', () => select(state.sel === p.id ? null : p.id));
   tr.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); select(state.sel === p.id ? null : p.id); } });
-  tb.appendChild(tr); p.row = tr;
+  tb.appendChild(tr); (p.rows = p.rows || []).push(tr);
 });
+$('pinBody').innerHTML = PINS.map(r => '<tr><td>' + r[0] + '</td><td class="mono">' + r[1] + '</td><td>' + r[2] + '</td></tr>').join('');
+$('clBody').innerHTML = CHANGELOG.map(s => '<li>' + s + '</li>').join('');
+$('itemCount').textContent = PARTS.length;
 
 $('explode').addEventListener('input', e => { state.eT = Number(e.target.value)/100; state.e = state.eT; syncUI(); });
 $('btnAsm').addEventListener('click', () => { state.eT = 0; syncUI(); if (gl) gl.fit(); });
@@ -946,8 +1327,11 @@ $('btnExp').addEventListener('click', () => { state.eT = 1; syncUI(); if (gl) gl
 $('vRef').addEventListener('click', () => { state.cycle = -1; setValve('ref'); });
 $('vHold').addEventListener('click', () => { state.cycle = -1; setValve('hold'); });
 $('vSamp').addEventListener('click', () => { state.cycle = -1; setValve('samp'); });
+$('ytMed').addEventListener('click', () => setVT('med'));
+$('ytHam').addEventListener('click', () => setVT('ham'));
 $('tSee').addEventListener('click', () => { state.see = !state.see; if (gl) gl.applyLook(); syncUI(); });
 $('tAir').addEventListener('click', toggleAir);
+$('tSec').addEventListener('click', () => { state.sec = !state.sec; if (gl) gl.applySection(); syncUI(); });
 $('tWire').addEventListener('click', () => { state.wire = !state.wire; if (state.wire) state.air = false; if (gl) gl.applyLook(); syncUI(); if (!state.sel) renderDetail(); });
 $('tBal').addEventListener('click', () => { state.balls = !state.balls; syncUI(); });
 $('tSpin').addEventListener('click', () => { state.spin = !state.spin; syncUI(); });
@@ -956,11 +1340,11 @@ $('reset').addEventListener('click', () => { if (gl) gl.fit(); });
 try {
   if (!window.THREE || !THREE.OrbitControls) throw new Error('3D library did not load');
   gl = build3D();
-  window.__sniff = {state, gl, setValve, syncUI};
+  window.__sniff = {state, gl, setValve, setVT, syncUI, calc, clearance, DIM};
 } catch (err) {
   console.error(err); $('noGL').hidden = false; $('reset').hidden = true; $('callouts').hidden = true; state.e = state.eT;
 }
-syncUI(); renderDetail();
+syncUI(); renderCalc(); renderDetail();
 })();
 </script>
 </body>
